@@ -1,14 +1,58 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 // Use the PORT environment variable provided by Railway, or default to 3000 for local testing
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the current directory, but excluding the HTML files to avoid duplicate content if possible, 
-// though express.static usually serves if exact match found.
-// We keep express.static for CSS, JS, Images.
 app.use(express.static(path.join(__dirname, '')));
+app.use(express.json()); // Enable JSON body parsing
+
+// Data File Path
+const DATA_FILE = path.join(__dirname, 'data', 'projects.json');
+
+// Helper to read data
+function getProjects() {
+    try {
+        const data = fs.readFileSync(DATA_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        return [];
+    }
+}
+
+// Helper to save data
+function saveProjects(projects) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(projects, null, 2));
+}
+
+// API Routes
+app.get('/api/projects', (req, res) => {
+    const category = req.query.category;
+    let projects = getProjects();
+    if (category) {
+        projects = projects.filter(p => p.category.toLowerCase() === category.toLowerCase());
+    }
+    res.json(projects);
+});
+
+app.post('/api/projects', (req, res) => {
+    const newProject = req.body;
+    const projects = getProjects();
+
+    // Simple ID generation
+    newProject.id = Date.now().toString();
+    projects.push(newProject);
+
+    saveProjects(projects);
+    res.json({ success: true, project: newProject });
+});
+
+// Admin Route
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
 
 // Route for the root path
 app.get('/', (req, res) => {

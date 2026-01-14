@@ -289,45 +289,7 @@
     </section>
 
     <main class="grid-container">
-        <!-- Project 1 -->
-        <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=1974&auto=format&fit=crop"
-                alt="Project 1" class="project-media">
-            <div class="project-info">
-                <h3 class="project-title">Electric Nights</h3>
-                <p class="project-cat">Live Concert</p>
-            </div>
-        </div>
-
-        <!-- Project 2 -->
-        <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=1974&auto=format&fit=crop"
-                alt="Project 2" class="project-media">
-            <div class="project-info">
-                <h3 class="project-title">The Beat</h3>
-                <p class="project-cat">Music Video</p>
-            </div>
-        </div>
-
-        <!-- Project 3 -->
-        <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop"
-                alt="Project 3" class="project-media">
-            <div class="project-info">
-                <h3 class="project-title">Studio Session</h3>
-                <p class="project-cat">Behind the Scenes</p>
-            </div>
-        </div>
-
-        <!-- Project 4 -->
-        <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop"
-                alt="Project 4" class="project-media">
-            <div class="project-info">
-                <h3 class="project-title">Vibes</h3>
-                <p class="project-cat">Visualizer</p>
-            </div>
-        </div>
+        <!-- Projects loaded dynamically via project-loader.js -->
     </main>
 
     <!-- Project Detail Modal -->
@@ -459,27 +421,11 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="project-loader.js"></script>
     <script>
-        gsap.from(".project-card", { y: 100, opacity: 0, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.5 });
-
+        // Modal Close Logic Only (Opening is handled by loader)
         const modal = document.querySelector('.project-modal');
         const closeBtn = document.querySelector('.close-modal');
-        const cards = document.querySelectorAll('.project-card, .carousel-item');
-        const modalTitle = document.querySelector('.modal-title');
-        const modalCat = document.querySelector('.modal-cat');
-
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const title = card.querySelector('.project-title, h4')?.textContent;
-                const cat = card.querySelector('.project-cat, p')?.textContent;
-                modalTitle.textContent = title;
-                modalCat.textContent = cat;
-                modal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-                gsap.to(modal, { opacity: 1, duration: 0.5 });
-                gsap.from(".modal-content", { y: 50, opacity: 0, duration: 0.8, delay: 0.2, ease: "power3.out" });
-            });
-        });
 
         closeBtn.addEventListener('click', () => {
             gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });

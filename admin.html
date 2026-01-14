@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Javier Filmmaker</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Syncopate:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #050505;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            color: #00d2ff;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        button {
+            background: #00d2ff;
+            color: #000;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: #fff;
+        }
+
+        .preview {
+            margin-top: 3rem;
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+        }
+
+        .success-msg {
+            color: #0f0;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        /* Auth Overlay */
+        #auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="auth-overlay">
+        <h2>JAVIER ADMIN</h2>
+        <input type="password" id="password" placeholder="Enter Password" style="width: 200px; margin: 1rem 0;">
+        <button onclick="checkPass()">Login</button>
+    </div>
+
+    <div class="container">
+        <h1>New Project</h1>
+
+        <form id="projectForm">
+            <div class="form-group">
+                <label>Category</label>
+                <select id="category" required>
+                    <option value="Creativo">Creativo</option>
+                    <option value="Restauracion">Restauracion</option>
+                    <option value="Documental">Documental</option>
+                    <option value="Musical">Musical</option>
+                    <option value="Inmobiliaria">Inmobiliaria</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Project Title</label>
+                <input type="text" id="title" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Main Thumbnail URL (Google Drive or Direct Link)</label>
+                <input type="text" id="thumbnail" required placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label>Gallery Images (One URL per line)</label>
+                <textarea id="gallery" rows="6" placeholder="https://...&#10;https://..."></textarea>
+            </div>
+
+            <button type="submit">Save Project</button>
+            <div class="success-msg">Project Saved Successfully!</div>
+        </form>
+    </div>
+
+    <script>
+        function checkPass() {
+            const pass = document.getElementById('password').value;
+            // Simple client-side check (Not secure, but sufficient for basic obscuring)
+            if (pass === 'javier123') {
+                document.getElementById('auth-overlay').style.display = 'none';
+            } else {
+                alert('Wrong password');
+            }
+        }
+
+        document.getElementById('projectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const galleryLinks = document.getElementById('gallery').value.split('\n').filter(l => l.trim());
+
+            const project = {
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                thumbnail: document.getElementById('thumbnail').value,
+                gallery: galleryLinks
+            };
+
+            const res = await fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(project)
+            });
+
+            if (res.ok) {
+                document.querySelector('.success-msg').style.display = 'block';
+                e.target.reset();
+                setTimeout(() => document.querySelector('.success-msg').style.display = 'none', 3000);
+            }
+        });
+    </script>
+</body>
+
+</html>
