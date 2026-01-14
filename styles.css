@@ -347,15 +347,25 @@ body.custom-cursor-active * {
     /* Valid centering */
     padding: 2rem 0.5rem;
     /* Less side padding when collapsed */
-    background: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Explicit property */
     backdrop-filter: blur(10px);
+
+    /* Dynamic Hover Background Setup */
+    background-image: var(--hover-bg, none);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+    /* Blend with the black color */
 }
 
 .portal-card:hover {
     flex: 3;
     padding: 2rem;
     /* Restore padding on expand */
-    background: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.3);
+    /* Lighter overlay to see image */
+    /* background-image is inherited but now visible/effective */
 }
 
 /* Shine Effect */
@@ -578,7 +588,9 @@ body.custom-cursor-active * {
     }
 
     /* Hide cursor elements on mobile (touch devices) - "The Grey Dot" */
-    .cursor, .cursor-trail, .cursor-dot {
+    .cursor,
+    .cursor-trail,
+    .cursor-dot {
         display: none !important;
     }
 

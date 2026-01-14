@@ -84,23 +84,57 @@ function attachModalListeners() {
     const modalDesc = document.querySelector('.modal-desc p');
     const modalGallery = document.querySelector('.modal-gallery');
 
-    document.querySelectorAll('.project-card').forEach(card => {
+    // Select both grid cards and carousel items
+    document.querySelectorAll('.project-card, .carousel-item').forEach(card => {
         card.addEventListener('click', () => {
-            const title = card.querySelector('.project-title').textContent;
-            const cat = card.querySelector('.project-cat').textContent;
+            // Data might be in different places depending on structure, but we used hidden divs in both
+            const title = card.querySelector('.project-title')?.textContent || card.querySelector('h4')?.textContent;
+            const cat = card.querySelector('.project-cat')?.textContent || card.querySelector('p')?.textContent;
+
+            // Prefer hidden data if available (Carousel has it hidden)
+            const hiddenTitle = card.querySelector('.project-title')?.textContent;
+            const hiddenCat = card.querySelector('.project-cat')?.textContent;
+
             const desc = card.querySelector('.project-desc').textContent;
             const galleryData = JSON.parse(card.querySelector('.project-gallery').textContent);
 
-            modalTitle.textContent = title;
-            modalCat.textContent = cat;
+            modalTitle.textContent = hiddenTitle || title;
+            modalCat.textContent = hiddenCat || cat;
             modalDesc.textContent = desc;
 
             // Render Gallery
             modalGallery.innerHTML = '';
-            galleryData.forEach(imgUrl => {
+            galleryData.forEach(url => {
                 const div = document.createElement('div');
                 div.className = 'gallery-item';
-                div.innerHTML = `<img src="${imgUrl}">`;
+
+                // Video Detection
+                if (url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
+                    // Convert Drive View to Preview (Embed)
+                    const embedUrl = url.replace(/\/view.*/, '/preview');
+                    div.innerHTML = `<iframe src="${embedUrl}" width="100%" height="400px" style="border:none;"></iframe>`;
+                    div.classList.add('video-item');
+                } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    // Basic YouTube support
+                    let videoId = url.split('v=')[1];
+                    const ampersandPosition = videoId ? videoId.indexOf('&') : -1;
+                    if (ampersandPosition != -1) {
+                        videoId = videoId.substring(0, ampersandPosition);
+                    }
+                    if (!videoId && url.includes('youtu.be')) {
+                        videoId = url.split('/').pop();
+                    }
+                    div.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" width="100%" height="400px" style="border:none;"></iframe>`;
+                    div.classList.add('video-item');
+                } else if (url.match(/\.(mp4|webm|ogg)$/i)) {
+                    // Direct Video File
+                    div.innerHTML = `<video controls src="${url}" width="100%"></video>`;
+                    div.classList.add('video-item');
+                } else {
+                    // Standard Image
+                    div.innerHTML = `<img src="${url}">`;
+                }
+
                 modalGallery.appendChild(div);
             });
             // Add thumbnail as first image if gallery empty? 
