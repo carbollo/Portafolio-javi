@@ -195,6 +195,10 @@
         .project-card:hover .project-info {
             transform: translateY(0);
             opacity: 1;
+            transform: translateY(0);
+            opacity: 1;
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .project-title {
@@ -289,38 +293,38 @@
             <img src="https://images.unsplash.com/photo-1541363111435-5c1b7d867904?q=80&w=2070&auto=format&fit=crop"
                 alt="Project 1" class="project-media">
             <div class="project-info">
-                <h3 class="project-title">Voices of Andes</h3>
-                <p class="project-cat">Humanity</p>
+                <h3 class="project-title">Andes</h3>
+                <p class="project-cat">Nature</p>
             </div>
         </div>
 
         <!-- Project 2 -->
         <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=1974&auto=format&fit=crop"
+            <img src="https://images.unsplash.com/photo-1505533321630-975218a5f66f?q=80&w=2876&auto=format&fit=crop"
                 alt="Project 2" class="project-media">
             <div class="project-info">
-                <h3 class="project-title">The Artisan</h3>
-                <p class="project-cat">Craftsmanship</p>
+                <h3 class="project-title">Amazonia</h3>
+                <p class="project-cat">Wildlife</p>
             </div>
         </div>
 
         <!-- Project 3 -->
         <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1605218427360-36390f855a00?q=80&w=1964&auto=format&fit=crop"
+            <img src="https://images.unsplash.com/photo-1544985220-54ee0e6b3b14?q=80&w=2071&auto=format&fit=crop"
                 alt="Project 3" class="project-media">
             <div class="project-info">
-                <h3 class="project-title">Wild Nature</h3>
-                <p class="project-cat">Environment</p>
+                <h3 class="project-title">Human</h3>
+                <p class="project-cat">Society</p>
             </div>
         </div>
 
         <!-- Project 4 -->
         <div class="project-card">
-            <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop"
+            <img src="https://images.unsplash.com/photo-1518388832007-8b010b95347f?q=80&w=2070&auto=format&fit=crop"
                 alt="Project 4" class="project-media">
             <div class="project-info">
-                <h3 class="project-title">Nomads</h3>
-                <p class="project-cat">Lifestyle</p>
+                <h3 class="project-title">Roots</h3>
+                <p class="project-cat">Culture</p>
             </div>
         </div>
     </main>
@@ -344,13 +348,13 @@
                         src="https://images.unsplash.com/photo-1541363111435-5c1b7d867904?q=80&w=2070&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item"><img
-                        src="https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=1974&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1505533321630-975218a5f66f?q=80&w=2876&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item wide"><img
-                        src="https://images.unsplash.com/photo-1605218427360-36390f855a00?q=80&w=1964&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1544985220-54ee0e6b3b14?q=80&w=2071&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item"><img
-                        src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1518388832007-8b010b95347f?q=80&w=2070&auto=format&fit=crop">
                 </div>
             </div>
         </div>
@@ -479,6 +483,29 @@
         closeBtn.addEventListener('click', () => {
             gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });
         });
+
+        // Auto-Rotation Script
+        const track = document.querySelector('.carousel-track');
+        let autoScrollInterval;
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                const itemWidth = track.firstElementChild.offsetWidth + 20; // Width + gap
+                const maxScroll = track.scrollWidth - track.clientWidth;
+
+                if (track.scrollLeft >= maxScroll - 5) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: itemWidth, behavior: 'smooth' });
+                }
+            }, 3000); // 3 seconds
+        }
+
+        startAutoScroll();
+
+        // Pause on hover
+        track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+        track.addEventListener('mouseleave', startAutoScroll);
     </script>
 </body>
 

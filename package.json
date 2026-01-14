@@ -1,0 +1,19 @@
+{
+  "name": "javier-filmmaker-portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio profesional de Javier Filmmaker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "portfolio",
+    "filmmaker",
+    "creative"
+  ],
+  "author": "Javier Filmmaker",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

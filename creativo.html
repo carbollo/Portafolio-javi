@@ -479,6 +479,29 @@
         closeBtn.addEventListener('click', () => {
             gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });
         });
+
+        // Auto-Rotation Script
+        const track = document.querySelector('.carousel-track');
+        let autoScrollInterval;
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                const itemWidth = track.firstElementChild.offsetWidth + 20; // Width + gap
+                const maxScroll = track.scrollWidth - track.clientWidth;
+
+                if (track.scrollLeft >= maxScroll - 5) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: itemWidth, behavior: 'smooth' });
+                }
+            }, 3000); // 3 seconds
+        }
+
+        startAutoScroll();
+
+        // Pause on hover
+        track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+        track.addEventListener('mouseleave', startAutoScroll);
     </script>
 </body>
 
