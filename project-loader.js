@@ -9,10 +9,17 @@ async function loadProjects() {
         const response = await fetch(`/api/projects?category=${cleanCategory}`);
         const projects = await response.json();
 
+        // Sort: Newest first (assuming pushed in chronological order, so just reverse)
+        projects.reverse();
+
         const grid = document.querySelector('.grid-container');
-        grid.innerHTML = ''; // Clear hardcoded content
+        const carouselTrack = document.querySelector('.carousel-track');
+
+        grid.innerHTML = '';
+        if (carouselTrack) carouselTrack.innerHTML = '';
 
         projects.forEach((p, index) => {
+            // Grid Card (Show ALL projects)
             const card = document.createElement('div');
             card.className = 'project-card';
             card.innerHTML = `
@@ -26,6 +33,38 @@ async function loadProjects() {
             `;
             grid.appendChild(card);
         });
+
+        // Carousel Items (Limit to Top 5 Newest)
+        if (carouselTrack) {
+            const carouselProjects = projects.slice(0, 5);
+
+            carouselProjects.forEach(p => {
+                const cItem = document.createElement('div');
+                cItem.className = 'carousel-item';
+                cItem.innerHTML = `
+                    <img src="${p.thumbnail}">
+                    <div class="carousel-info">
+                        <h4>${p.title}</h4>
+                        <p>${p.category}</p>
+                    </div>
+                    <!-- Hidden data for modal reuse -->
+                    <div style="display:none" class="project-title">${p.title}</div>
+                    <div style="display:none" class="project-cat">${p.category}</div>
+                    <div style="display:none" class="project-desc">${p.description || ''}</div>
+                    <div style="display:none" class="project-gallery">${JSON.stringify(p.gallery || [])}</div>
+                `;
+                carouselTrack.appendChild(cItem);
+            });
+
+            // Setup Infinite Scroll (Cloning) - Only if we have items
+            if (carouselProjects.length > 0) {
+                const originalItems = Array.from(carouselTrack.children);
+                originalItems.forEach(item => {
+                    const clone = item.cloneNode(true);
+                    carouselTrack.appendChild(clone);
+                });
+            }
+        }
 
         // Re-attach Modal Listeners
         attachModalListeners();
