@@ -65,16 +65,35 @@ function initPortalExpansion() {
             document.body.appendChild(clone);
 
             // 3. Animate Expansion
+            const cloneTitle = clone.querySelector('.portal-title');
+            const cloneNumber = clone.querySelector('.portal-number');
+            const cloneDesc = clone.querySelector('.portal-desc');
+
+            // Fade out text/borders inside the clone immediately
+            gsap.to([cloneTitle, cloneNumber, cloneDesc], {
+                opacity: 0,
+                scale: 0.9,
+                duration: 0.4,
+                ease: "power2.out"
+            });
+
+            // Also fade out the original card's content to prevent "jump"
+            const originalContent = portal.querySelectorAll('.portal-title, .portal-number, .portal-desc');
+            gsap.to(originalContent, {
+                opacity: 0,
+                duration: 0.4
+            });
+
             gsap.to(clone, {
                 top: 0,
                 left: 0,
                 width: '100vw',
                 height: '100vh',
-                padding: '4rem', // Center content a bit
-                backgroundColor: '#000', // Fill background opaquely
+                padding: '4rem',
+                backgroundColor: '#000',
                 borderRadius: 0,
-                borderColor: '#fff', // Flash border white?
-                duration: 0.8,
+                borderColor: 'rgba(255,255,255,0)', // Fade out border too
+                duration: 1.2, // Slower expansion for drama
                 ease: 'power3.inOut',
                 onComplete: () => {
                     window.location.href = href;
