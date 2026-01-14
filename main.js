@@ -59,8 +59,10 @@ function initPortalExpansion() {
             clone.style.transition = 'none'; // Disable CSS transition for GSAP control
             clone.style.margin = '0';
 
-            // Optional: reset transform if any
-            clone.style.transform = 'translate(0,0)';
+            // Hardware acceleration hints for mobile smoothness
+            clone.style.transform = 'translateZ(0)';
+            clone.style.backfaceVisibility = 'hidden';
+            clone.style.willChange = 'top, left, width, height, opacity';
 
             document.body.appendChild(clone);
 
@@ -88,13 +90,13 @@ function initPortalExpansion() {
                 top: 0,
                 left: 0,
                 width: '100vw',
-                height: '100vh',
+                height: window.innerHeight, // Use explicit px height for mobile stability
                 padding: '4rem',
                 backgroundColor: '#000',
                 borderRadius: 0,
                 borderColor: 'rgba(255,255,255,0)', // Fade out border too
-                duration: 1.2, // Slower expansion for drama
-                ease: 'power3.inOut',
+                duration: 1.0, // Slightly faster to feel more responsive
+                ease: 'power4.inOut', // More dramatic ease for "fluidity"
                 onComplete: () => {
                     window.location.href = href;
                 }

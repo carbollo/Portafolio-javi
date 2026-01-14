@@ -576,4 +576,14 @@ body.custom-cursor-active * {
     .hero-title {
         font-size: 12vw;
     }
+
+    /* Hide cursor elements on mobile (touch devices) - "The Grey Dot" */
+    .cursor, .cursor-trail, .cursor-dot {
+        display: none !important;
+    }
+
+    /* Hide portal numbers on mobile */
+    .portal-number {
+        display: none;
+    }
 }
