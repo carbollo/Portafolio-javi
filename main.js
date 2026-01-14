@@ -52,6 +52,9 @@ window.addEventListener('load', () => {
                 const content = p.querySelectorAll('.portal-title, .portal-number, .portal-desc');
                 gsap.to(content, { opacity: 1, duration: 0.2 });
             });
+
+            // CRITICAL: Reset Main Container Opacity (it was faded out during exit)
+            gsap.to('.app-container', { opacity: 1, duration: 0.2 });
         }
     });
 
