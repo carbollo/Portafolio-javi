@@ -21,9 +21,20 @@ async function loadProjects() {
         projects.forEach((p, index) => {
             // Grid Card (Show ALL projects)
             const card = document.createElement('div');
+
+            // Helper to fix Drive links (duplicate helper, but safe scope)
+            const fixUrl = (url) => {
+                if (url && url.includes('drive.google.com') && url.includes('/view')) {
+                    return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=view&id=$1');
+                }
+                return url;
+            };
+
+            const cleanThumb = fixUrl(p.thumbnail);
+
             card.className = 'project-card';
             card.innerHTML = `
-                <img src="${p.thumbnail}" alt="${p.title}" class="project-media">
+                <img src="${cleanThumb}" alt="${p.title}" class="project-media">
                 <div class="project-info">
                     <h3 class="project-title">${p.title}</h3>
                     <p class="project-cat">${p.category}</p>
@@ -40,9 +51,20 @@ async function loadProjects() {
 
             carouselProjects.forEach(p => {
                 const cItem = document.createElement('div');
+
+                // Helper to fix Drive links
+                const fixUrl = (url) => {
+                    if (url.includes('drive.google.com') && url.includes('/view')) {
+                        return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=view&id=$1');
+                    }
+                    return url;
+                };
+
+                const cleanThumb = fixUrl(p.thumbnail);
+
                 cItem.className = 'carousel-item';
                 cItem.innerHTML = `
-                    <img src="${p.thumbnail}">
+                    <img src="${cleanThumb}">
                     <div class="carousel-info">
                         <h4>${p.title}</h4>
                         <p>${p.category}</p>
@@ -56,8 +78,9 @@ async function loadProjects() {
                 carouselTrack.appendChild(cItem);
             });
 
-            // Setup Infinite Scroll (Cloning) - Only if we have items
-            if (carouselProjects.length > 0) {
+            // Setup Infinite Scroll (Cloning) - ONLY if we have many items (> 4)
+            // If we have few items, cloning them looks weird/repetitive.
+            if (carouselProjects.length > 4) {
                 const originalItems = Array.from(carouselTrack.children);
                 originalItems.forEach(item => {
                     const clone = item.cloneNode(true);
