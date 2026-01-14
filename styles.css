@@ -339,7 +339,7 @@ body.custom-cursor-active * {
     text-decoration: none;
     color: var(--text-color);
     overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -368,7 +368,7 @@ body.custom-cursor-active * {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
     transform: skewX(-20deg);
-    transition: left 0.6s ease;
+    transition: left 0.8s ease;
     z-index: 1;
 }
 
@@ -380,7 +380,7 @@ body.custom-cursor-active * {
     position: relative;
     z-index: 2;
     transform: translateY(20px);
-    transition: transform 0.4s ease;
+    transition: transform 0.6s ease;
     text-align: center;
     /* Center text horizontally */
     width: 100%;
@@ -401,15 +401,14 @@ body.custom-cursor-active * {
     left: 50%;
     transform: translateX(-50%);
     /* True Center */
-    transition: all 0.3s;
+    transition: all 0.8s ease;
 }
 
 .portal-card:hover .portal-number {
     opacity: 0;
     transform: translateX(-50%) translateY(-20px) scale(0.8);
     /* Slight movement up while fading */
-    transition: all 0.2s ease-out;
-    /* Fast fade out */
+    transition: all 0.8s ease;
 }
 
 /* Removed numberPulse animation as it is no longer needed */
@@ -420,6 +419,7 @@ body.custom-cursor-active * {
     margin-bottom: 0.5rem;
     white-space: nowrap;
     position: relative;
+    transition: color 0.8s ease, text-shadow 0.8s ease;
 }
 
 /* Glitch Effect on Title */
