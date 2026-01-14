@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUSICAL | Javier Filmmaker</title>
+    <title>RESTAURACION | Javier Filmmaker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Syncopate:wght@400;700&display=swap"
@@ -66,7 +66,7 @@
             font-size: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 4px;
-            color: #FF00FF;
+            color: #0f0;
         }
 
         /* Carousel Styles */
@@ -200,6 +200,8 @@
         .project-card:hover .project-info {
             transform: translateY(0);
             opacity: 1;
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .project-title {
@@ -224,8 +226,13 @@
 
             header {
                 padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1rem;
+            }
+        }
     </style>
-    <title>Creativo | Javier Filmmaker</title>
 </head>
 
 <body class="portfolio-page">
@@ -233,8 +240,8 @@
         <a href="/" class="back-link">
             <span class="arrow">←</span> BACK
         </a>
-        <h1 class="page-title">Creativo</h1>
-        <p class="page-subtitle">Arte & Concepto</p>
+        <h1 class="page-title">Conciertos</h1>
+        <p class="page-subtitle">Live Music & Eventos</p>
     </div>
 
     <!-- Project Carousel -->
@@ -265,16 +272,16 @@
 
             <div class="modal-gallery">
                 <div class="gallery-item"><img
-                        src="https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=1974&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item"><img
-                        src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=1974&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item wide"><img
-                        src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop">
                 </div>
                 <div class="gallery-item"><img
-                        src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop">
+                        src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop">
                 </div>
             </div>
         </div>
@@ -388,7 +395,7 @@
             gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });
         });
 
-
+        // Scroll handled by CSS animation in .carousel-track
     </script>
 </body>
 
