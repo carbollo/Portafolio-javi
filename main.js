@@ -200,6 +200,15 @@ function goToSection(index) {
     // Animate stars based on movement
     // e.g. accelerate during transition?
     // For now, let's keep it simple.
+
+    // 2026 Update: Animate Scroll Hint Visibility
+    if (index === 1) {
+        // Going down -> Hide Hint
+        gsap.to('.hero-scroll-hint', { opacity: 0, duration: 0.5, ease: "power2.out" });
+    } else {
+        // Going up -> Show Hint
+        gsap.to('.hero-scroll-hint', { opacity: 0.5, duration: 0.8, delay: 0.5, ease: "power2.out" });
+    }
 }
 
 
