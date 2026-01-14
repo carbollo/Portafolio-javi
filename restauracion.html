@@ -72,30 +72,35 @@
         /* Carousel Styles */
         .featured-carousel {
             margin-top: 6rem;
-            padding-left: 4rem;
+            padding-left: 0;
+            /* Remove padding to avoid jump */
             position: relative;
-        }
-
-        .section-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.5;
-            margin-bottom: 2rem;
+            overflow: hidden;
+            /* Hide scrollbar */
+            width: 100%;
         }
 
         .carousel-track {
             display: flex;
             gap: 20px;
-            overflow-x: auto;
+            width: max-content;
+            /* Ensure items don't wrap */
             padding-bottom: 2rem;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            /* Hide scrollbar */
+            animation: scroll 40s linear infinite;
         }
 
-        .carousel-track::-webkit-scrollbar {
-            display: none;
+        .carousel-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
 
         .carousel-item {
@@ -491,31 +496,7 @@
             const clone = item.cloneNode(true);
             track.appendChild(clone);
         });
-
-        let scrollPos = 0;
-        const speed = 1; // 1px per frame for smooth constant motion
-        let isHovered = false;
-        let animationFrameId;
-
-        function smoothScroll() {
-            if (!isHovered) {
-                scrollPos += speed;
-                // Since we doubled content, reset to 0 when we reach the end of the original set
-                if (scrollPos >= track.scrollWidth / 2) {
-                    scrollPos = 0;
-                }
-                track.scrollLeft = scrollPos;
-            } else {
-                scrollPos = track.scrollLeft;
-            }
-            animationFrameId = requestAnimationFrame(smoothScroll);
-        }
-
-        // Listeners for pause
-        track.addEventListener('mouseenter', () => isHovered = true);
-        track.addEventListener('mouseleave', () => isHovered = false);
-
-        smoothScroll();
+        // Scroll handled by CSS animation in .carousel-track
     </script>
 </body>
 
