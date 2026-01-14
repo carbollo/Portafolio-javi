@@ -550,6 +550,17 @@ body.custom-cursor-active * {
     .portals-container {
         flex-direction: column;
         height: auto;
+        padding-bottom: 4rem;
+        /* Add space for scrolling */
+    }
+
+    /* Allow normal scrolling on mobile */
+    .app-container,
+    .hero-section,
+    .portals-section {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
     }
 
     .portal-card {

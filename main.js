@@ -110,9 +110,15 @@ function initPortalExpansion() {
 // Scroll Locking Logic (Hero <-> Portals)
 // ===========================================
 function initScrollLock() {
+    // Disable Scroll Lock on Mobile (Native scroll is better)
+    if (window.innerWidth <= 768) return;
+
     // Prevent default scroll behavior
     window.addEventListener('wheel', handleScroll, { passive: false });
-    window.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener('touchmove', (e) => {
+        // Only prevent if not mobile (double check in case of resize)
+        if (window.innerWidth > 768) e.preventDefault();
+    }, { passive: false });
 
     // Handle Wheel
     function handleScroll(e) {
