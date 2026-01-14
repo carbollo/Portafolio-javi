@@ -484,28 +484,40 @@
             gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });
         });
 
-        // Auto-Rotation Script
+        // Continuous Auto-Rotation Script
         const track = document.querySelector('.carousel-track');
-        let autoScrollInterval;
 
-        function startAutoScroll() {
-            autoScrollInterval = setInterval(() => {
-                const itemWidth = track.firstElementChild.offsetWidth + 20; // Width + gap
-                const maxScroll = track.scrollWidth - track.clientWidth;
+        // Clone items for infinite loop illusion
+        const originalItems = Array.from(track.children);
+        originalItems.forEach(item => {
+            const clone = item.cloneNode(true);
+            track.appendChild(clone);
+        });
 
-                if (track.scrollLeft >= maxScroll - 5) {
-                    track.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    track.scrollBy({ left: itemWidth, behavior: 'smooth' });
+        let scrollPos = 0;
+        const speed = 1; // 1px per frame for smooth constant motion
+        let isHovered = false;
+        let animationFrameId;
+
+        function smoothScroll() {
+            if (!isHovered) {
+                scrollPos += speed;
+                // Since we doubled content, reset to 0 when we reach the end of the original set
+                if (scrollPos >= track.scrollWidth / 2) {
+                    scrollPos = 0;
                 }
-            }, 3000); // 3 seconds
+                track.scrollLeft = scrollPos;
+            } else {
+                scrollPos = track.scrollLeft;
+            }
+            animationFrameId = requestAnimationFrame(smoothScroll);
         }
 
-        startAutoScroll();
+        // Listeners for pause
+        track.addEventListener('mouseenter', () => isHovered = true);
+        track.addEventListener('mouseleave', () => isHovered = false);
 
-        // Pause on hover
-        track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
-        track.addEventListener('mouseleave', startAutoScroll);
+        smoothScroll();
     </script>
 </body>
 
