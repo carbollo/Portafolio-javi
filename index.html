@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javier Filmmaker</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;1,400&family=Syncopate:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-text">INICIANDO NÚCLEO VISUAL</div>
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-trail"></div> <!-- Container for trail dots -->
+
+    <!-- 3D Background Canvas -->
+    <canvas id="webgl"></canvas>
+
+    <!-- Nebula Overlay -->
+    <div class="nebula-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="app-container">
+
+        <header class="hero-section">
+            <div class="logo">JAVIER <span class="dot">.</span></div>
+            <h1 class="hero-title">
+                <span class="line-1">CREANDO</span>
+                <span class="line-2">REALIDADES</span>
+                <span class="line-3">VISUALES</span>
+            </h1>
+            <p class="hero-subtitle">Selecciona tu dimensión</p>
+
+            <div class="hero-scroll-hint">
+                <span>SCROLL</span>
+                <div class="arrow"></div>
+            </div>
+        </header>
+
+        <section class="portals-section" id="portals">
+            <div class="portals-container">
+                <!-- Portal 1: CREATIVO -->
+                <a href="creativo.html" class="portal-card" data-theme="cine">
+                    <div class="portal-content">
+                        <div class="portal-number">01</div>
+                        <h2 class="portal-title" data-text="CREATIVO">CREATIVO</h2>
+                        <p class="portal-desc">Cinematografía & Arte</p>
+                    </div>
+                </a>
+
+                <!-- Portal 2: RESTAURACION -->
+                <a href="restauracion.html" class="portal-card" data-theme="commercial">
+                    <div class="portal-content">
+                        <div class="portal-number">02</div>
+                        <h2 class="portal-title" data-text="RESTAURACION">RESTAURACION</h2>
+                        <p class="portal-desc">Gastronomía & Experiencias</p>
+                    </div>
+                </a>
+
+                <!-- Portal 3: DOCUMENTAL -->
+                <a href="documental.html" class="portal-card" data-theme="docu">
+                    <div class="portal-content">
+                        <div class="portal-number">03</div>
+                        <h2 class="portal-title" data-text="DOCUMENTAL">DOCUMENTAL</h2>
+                        <p class="portal-desc">Historias Reales</p>
+                    </div>
+                </a>
+
+                <!-- Portal 4: MUSICAL -->
+                <a href="musical.html" class="portal-card" data-theme="music">
+                    <div class="portal-content">
+                        <div class="portal-number">04</div>
+                        <h2 class="portal-title" data-text="MUSICAL">MUSICAL</h2>
+                        <p class="portal-desc">Videoclips & Visuales</p>
+                    </div>
+                </a>
+
+                <!-- Portal 5: INMOBILIARIA -->
+                <a href="inmobiliaria.html" class="portal-card" data-theme="wedding">
+                    <div class="portal-content">
+                        <div class="portal-number">05</div>
+                        <h2 class="portal-title" data-text="INMOBILIARIA">INMOBILIARIA</h2>
+                        <p class="portal-desc">Arquitectura & Espacios</p>
+                    </div>
+                </a>
+            </div>
+
+            <footer class="main-footer">
+                <div class="footer-links">
+                    <a href="https://www.instagram.com/ljavissj" target="_blank">Instagram</a>
+                    <a href="#">TikTok</a>
+                    <a href="#">Email</a>
+                </div>
+                <div class="copyright">© 2026 JAVIER</div>
+            </footer>
+        </section>
+
+    </main>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
