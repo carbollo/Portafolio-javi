@@ -31,7 +31,33 @@ window.addEventListener('load', () => {
     initScrollLock();
 
     // 6. Init Portal Expansion
+    // 6. Init Portal Expansion
     initPortalExpansion();
+
+    // 7. Handle Back/Forward Cache (Mobile Black Screen Fix)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            // Force reload or clean up if restored from cache
+            const clones = document.querySelectorAll('.portal-card[style*="fixed"]');
+            clones.forEach(clone => clone.remove());
+
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'none';
+
+            document.body.classList.remove('no-scroll');
+
+            // Reset original portals opacity
+            const portals = document.querySelectorAll('.portal-card');
+            portals.forEach(p => {
+                const content = p.querySelectorAll('.portal-title, .portal-number, .portal-desc');
+                gsap.to(content, { opacity: 1, duration: 0.2 });
+            });
+        }
+    });
+
+    // Cleanup on simple load too, just in case
+    const clones = document.querySelectorAll('.portal-card[style*="fixed"]');
+    clones.forEach(clone => clone.remove());
 });
 
 // ===========================================

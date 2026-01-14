@@ -152,4 +152,65 @@ function attachModalListeners() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', loadProjects);
+document.addEventListener('DOMContentLoaded', () => {
+    loadProjects();
+    setupContactModal();
+});
+
+function setupContactModal() {
+    // 1. Inject Modal HTML if not exists
+    if (!document.getElementById('contact-modal')) {
+        const modalHTML = `
+            <div id="contact-modal" class="project-modal" style="z-index: 250;">
+                <button class="close-contact-modal close-modal">✕</button>
+                <div class="modal-content" style="text-align: center;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">SOBRE MÍ</h2>
+                        <div class="about-container" style="display: flex; flex-direction: column; align-items: center; gap: 2rem;">
+                            <!-- Profile Image -->
+                            <div class="profile-img" style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; border: 2px solid #333;">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <!-- Bio Text -->
+                            <div class="modal-desc" style="max-width: 600px;">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                                <p style="margin-top: 1rem;">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                            </div>
+                            <!-- Email/Socials -->
+                            <div class="contact-links" style="margin-top: 2rem;">
+                                <a href="mailto:email@example.com" style="color: #fff; text-decoration: none; border: 1px solid #fff; padding: 10px 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; transition: background 0.3s;">Email Me</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    // 2. Logic
+    const modal = document.getElementById('contact-modal');
+    const closeBtn = modal.querySelector('.close-contact-modal');
+
+    // Find Contact Link(s) - looking for the specific text "Contacto" in nav
+    const contactLinks = Array.from(document.querySelectorAll('nav a')).filter(a => a.textContent.trim() === 'Contacto');
+
+    contactLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            gsap.to(modal, { opacity: 1, duration: 0.5 });
+            gsap.from(modal.querySelector('.modal-content'), { y: 50, opacity: 0, duration: 0.8, delay: 0.2, ease: "power3.out" });
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        gsap.to(modal, {
+            opacity: 0, duration: 0.5, onComplete: () => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    });
+}
