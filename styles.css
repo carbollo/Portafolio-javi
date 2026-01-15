@@ -599,3 +599,11 @@ body.custom-cursor-active * {
         display: none;
     }
 }
+
+/* Global Image Fixes - Added by Agent */
+.project-media,
+.carousel-item img,
+.gallery-item img {
+    object-fit: contain !important; /* Show full image, don't crop */
+    background-color: #000; /* Fill gaps with black */
+}

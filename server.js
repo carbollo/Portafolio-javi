@@ -61,10 +61,10 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
             const outputPath = path.join('images', filename);
 
             // Process with Sharp
-            // Resize to max 1920px width, prevent upscaling, high quality
+            // Resize to max 2500px width (better for retina), high quality
             await sharp(file.buffer)
-                .resize(1920, null, { withoutEnlargement: true })
-                .webp({ quality: 85 }) // Good balance of quality/size
+                .resize(2500, null, { withoutEnlargement: true })
+                .webp({ quality: 95, lossless: false }) // Very high quality
                 .toFile(outputPath);
 
             // Path relative to root for frontend
