@@ -34,7 +34,7 @@ function saveProjects(projects) {
 
 const multer = require('multer');
 const sharp = require('sharp');
-const fs = require('fs'); // Ensure fs is available
+// fs already imported at top by express generator or previous steps
 
 // Ensure images directory exists on startup
 if (!fs.existsSync('images')) {
