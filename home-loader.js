@@ -12,10 +12,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Allowed categories matching the HTML hrefs/data-text
         const categories = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
 
+        // Helper to fix Drive links (Shared logic)
+        const fixUrl = (url) => {
+            if (url && url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
+                return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
+            }
+            return url;
+        };
+
         categories.forEach(cat => {
             const project = projects.find(p => p.category === cat);
             if (project && project.thumbnail) {
-                categoryImages[cat] = project.thumbnail;
+                categoryImages[cat] = fixUrl(project.thumbnail);
             }
         });
 

@@ -24,8 +24,8 @@ async function loadProjects() {
 
             // Helper to fix Drive links (duplicate helper, but safe scope)
             const fixUrl = (url) => {
-                if (url && url.includes('drive.google.com') && url.includes('/view')) {
-                    return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=view&id=$1');
+                if (url && url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
+                    return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
                 }
                 return url;
             };
@@ -54,8 +54,8 @@ async function loadProjects() {
 
                 // Helper to fix Drive links
                 const fixUrl = (url) => {
-                    if (url.includes('drive.google.com') && url.includes('/view')) {
-                        return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=view&id=$1');
+                    if (url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
+                        return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
                     }
                     return url;
                 };
