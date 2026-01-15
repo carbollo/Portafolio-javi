@@ -6,6 +6,11 @@ const app = express();
 // Use the PORT environment variable provided by Railway, or default to 3000 for local testing
 const PORT = process.env.PORT || 3000;
 
+// Ensure images directory exists
+if (!fs.existsSync('images')) {
+    fs.mkdirSync('images');
+}
+
 app.use(express.static(path.join(__dirname, '')));
 app.use(express.json()); // Enable JSON body parsing
 
