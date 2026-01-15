@@ -154,12 +154,15 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 40px;
+            align-items: start;
+            /* Prevents stretching */
         }
 
         .project-card {
             position: relative;
-            background: #111;
+            background: transparent;
             /* aspect-ratio removed */
+            height: auto;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
