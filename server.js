@@ -97,7 +97,24 @@ app.post('/api/projects', (req, res) => {
     projects.push(newProject);
 
     saveProjects(projects);
+    saveProjects(projects);
     res.json({ success: true, project: newProject });
+});
+
+app.delete('/api/projects/:id', (req, res) => {
+    const id = req.params.id;
+    let projects = getProjects();
+    const initialLength = projects.length;
+
+    // Filter out the project with the given ID
+    projects = projects.filter(p => p.id !== id);
+
+    if (projects.length === initialLength) {
+        return res.status(404).json({ error: 'Project not found' });
+    }
+
+    saveProjects(projects);
+    res.json({ success: true });
 });
 
 // Admin Route

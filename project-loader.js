@@ -186,26 +186,107 @@ function setupContactModal() {
         const modalHTML = `
             <div id="contact-modal" class="project-modal" style="z-index: 250;">
                 <button class="close-contact-modal close-modal">✕</button>
-                <div class="modal-content" style="text-align: center;">
+                <div class="modal-content" style="text-align: left;">
                     <div class="modal-header">
-                        <h2 class="modal-title">SOBRE MÍ</h2>
-                        <div class="about-container" style="display: flex; flex-direction: column; align-items: center; gap: 2rem;">
-                            <!-- Profile Image -->
-                            <div class="profile-img" style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; border: 2px solid #333;">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" style="width: 100%; height: 100%; object-fit: cover;">
+                        <h2 class="modal-title" style="text-align: center; margin-bottom: 3rem;">SOBRE MÍ</h2>
+                        <div class="about-container">
+                            
+                            <!-- Bio Text & Links (Left) -->
+                            <div class="about-text">
+                                <div class="modal-desc">
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                                    <p style="margin-top: 1rem;">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                </div>
+                                <!-- Email/Socials -->
+                                <div class="contact-links" style="margin-top: 2rem;">
+                                    <a href="mailto:email@example.com" class="contact-btn">Email Me</a>
+                                </div>
                             </div>
-                            <!-- Bio Text -->
-                            <div class="modal-desc" style="max-width: 600px;">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                <p style="margin-top: 1rem;">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+                            <!-- Profile Image (Right) -->
+                            <div class="profile-img">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop">
                             </div>
-                            <!-- Email/Socials -->
-                            <div class="contact-links" style="margin-top: 2rem;">
-                                <a href="mailto:email@example.com" style="color: #fff; text-decoration: none; border: 1px solid #fff; padding: 10px 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; transition: background 0.3s;">Email Me</a>
-                            </div>
+
                         </div>
                     </div>
                 </div>
+                <style>
+                    /* Dynamic Styles for Contact Modal */
+                    .about-container {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: flex-start;
+                        gap: 4rem;
+                        max-width: 1000px;
+                        margin: 0 auto;
+                    }
+
+                    .about-text {
+                        flex: 1;
+                        font-family: 'Montserrat', sans-serif;
+                        line-height: 1.8;
+                        font-size: 0.95rem;
+                        opacity: 0.9;
+                    }
+
+                    .profile-img {
+                        flex: 0 0 350px; /* Fixed width for image column */
+                        width: 350px;
+                        height: auto;
+                        overflow: hidden;
+                    }
+
+                    .profile-img img {
+                        width: 100%;
+                        height: auto;
+                        display: block;
+                        /* No border radius, original aspect ratio */
+                    }
+
+                    .contact-btn {
+                        display: inline-block;
+                        color: #fff;
+                        text-decoration: none;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        padding: 12px 30px;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                        font-size: 0.8rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .contact-btn:hover {
+                        background: #fff;
+                        color: #000;
+                        border-color: #fff;
+                    }
+
+                    @media(max-width: 768px) {
+                        .about-container {
+                            flex-direction: column-reverse; /* Text top, Image bottom? Or Standard Column? Usually Image Top is better, but user asked for text left image right on desktop. Let's do Image Top on mobile. */
+                            align-items: center;
+                            gap: 2rem;
+                            text-align: center;
+                        }
+                        
+                        /* If we use column-reverse, image is at bottom. 
+                           If we use column, image is at top (if we swap order).
+                           Let's check the DOM structure: Text is first, Image is second.
+                           So flex-direction: column -> Text Top, Image Bottom.
+                           flex-direction: column-reverse -> Image Top, Text Bottom. (Standard mobile often has image first)
+                        */
+                         .about-container {
+                            flex-direction: column-reverse; 
+                         }
+
+                        .profile-img {
+                            width: 100%;
+                            flex: none;
+                            max-width: 400px;
+                        }
+                    }
+                </style>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
