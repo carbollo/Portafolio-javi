@@ -604,6 +604,30 @@ body.custom-cursor-active * {
 .project-media,
 .carousel-item img,
 .gallery-item img {
-    object-fit: contain !important; /* Show full image, don't crop */
-    background-color: #000; /* Fill gaps with black */
+    object-fit: contain !important;
+    /* Show full image, don't crop */
+    background-color: #000;
+    /* Fill gaps with black */
+}
+
+/* Adaptive Aspect Ratio Overrides */
+.project-card {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 200px;
+    /* Prevent total collapse */
+    background: transparent !important;
+    /* Remove background to avoid black bars if desired, or keep black */
+}
+
+.project-media {
+    height: auto !important;
+    /* Let image define height */
+    max-height: 600px;
+    /* Cap huge verticals */
+}
+
+/* Ensure grid items align to top, not stretch */
+.grid-container {
+    align-items: start !important;
 }
