@@ -199,13 +199,13 @@ function setupContactModal() {
                                 </div>
                                 <!-- Email/Socials -->
                                 <div class="contact-links" style="margin-top: 2rem;">
-                                    <a href="mailto:email@example.com" class="contact-btn">Email Me</a>
+                                    <a href="mailto:Ljavi141@gmail.com" class="contact-btn">Email Me</a>
                                 </div>
                             </div>
 
                             <!-- Profile Image (Right) -->
                             <div class="profile-img">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop">
+                                <img src="images/javier-profile.jpg" alt="Javier">
                             </div>
 
                         </div>
