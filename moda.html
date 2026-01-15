@@ -151,27 +151,25 @@
             /* Reduced top padding */
             max-width: 1600px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            align-items: start;
-            /* Prevents stretching */
+            column-count: 3;
+            column-gap: 40px;
         }
 
         @media(max-width: 1024px) {
             .grid-container {
-                grid-template-columns: repeat(2, 1fr);
+                column-count: 2;
             }
         }
 
         .project-card {
             position: relative;
             background: transparent;
-            /* aspect-ratio removed */
             height: auto;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            break-inside: avoid;
+            margin-bottom: 40px;
         }
 
         .project-card:hover {
@@ -226,7 +224,7 @@
         /* Responsive */
         @media(max-width: 768px) {
             .grid-container {
-                grid-template-columns: 1fr;
+                column-count: 1;
                 padding: 6rem 1rem 2rem;
             }
 
@@ -377,18 +375,18 @@
         }
 
         .modal-gallery {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            column-count: 2;
+            column-gap: 20px;
         }
 
         .gallery-item {
             width: 100%;
-            /* aspect-ratio removed for gallery */
+            break-inside: avoid;
+            margin-bottom: 20px;
         }
 
         .gallery-item.wide {
-            grid-column: span 2;
+            column-span: all;
         }
 
         .gallery-item img {
@@ -399,11 +397,11 @@
 
         @media(max-width: 768px) {
             .modal-gallery {
-                grid-template-columns: 1fr;
+                column-count: 1;
             }
 
             .gallery-item.wide {
-                grid-column: span 1;
+                column-span: none;
             }
         }
     </style>

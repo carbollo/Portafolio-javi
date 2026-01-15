@@ -151,97 +151,101 @@
             /* Reduced top padding */
             max-width: 1600px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            align-items: start;
-            /* Prevents stretching */
-        }
 
-        @media(max-width: 1024px) {
             .grid-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .project-card {
-            position: relative;
-            background: transparent;
-            /* aspect-ratio removed */
-            height: auto;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .project-card:hover {
-            transform: scale(0.98);
-        }
-
-        /* Video/Image Placeholder */
-        .project-media {
-            width: 100%;
-            /* fixed height & cover removed */
-            opacity: 0.8;
-            transition: all 0.5s ease;
-            transform: scale(1.05);
-        }
-
-        .project-card:hover .project-media {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* Overlay Info */
-        .project-info {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 2rem;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-
-        .project-card:hover .project-info {
-            transform: translateY(0);
-            opacity: 1;
-            transform: translateY(0);
-            opacity: 1;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .project-title {
-            font-family: 'Syncopate', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-cat {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ccc;
-        }
-
-        /* Responsive */
-        @media(max-width: 768px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-                padding: 6rem 1rem 2rem;
+                padding: 2rem 4rem 4rem;
+                /* Reduced top padding */
+                max-width: 1600px;
+                margin: 0 auto;
+                column-count: 3;
+                column-gap: 40px;
             }
 
-            header {
-                padding: 1.5rem;
+            @media(max-width: 1024px) {
+                .grid-container {
+                    column-count: 2;
+                }
             }
 
-            .page-title {
-                font-size: 1rem;
+            .project-card {
+                position: relative;
+                background: transparent;
+                height: auto;
+                overflow: hidden;
+                cursor: pointer;
+                transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+                break-inside: avoid;
+                margin-bottom: 40px;
             }
-        }
+
+            .project-card:hover {
+                transform: scale(0.98);
+            }
+
+            /* Video/Image Placeholder */
+            .project-media {
+                width: 100%;
+                /* fixed height & cover removed */
+                opacity: 0.8;
+                transition: all 0.5s ease;
+                transform: scale(1.05);
+            }
+
+            .project-card:hover .project-media {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            /* Overlay Info */
+            .project-info {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding: 2rem;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+                transform: translateY(20px);
+                opacity: 0;
+                transition: all 0.4s ease;
+            }
+
+            .project-card:hover .project-info {
+                transform: translateY(0);
+                opacity: 1;
+                transform: translateY(0);
+                opacity: 1;
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .project-title {
+                font-family: 'Syncopate', sans-serif;
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .project-cat {
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: #ccc;
+            }
+
+            /* Responsive */
+            @media(max-width: 768px) {
+                .grid-container {
+                    column-count: 1;
+                    padding: 6rem 1rem 2rem;
+                }
+
+                header {
+                    padding: 1.5rem;
+                }
+
+                .page-title {
+                    font-size: 1rem;
+                }
+            }
     </style>
 </head>
 
@@ -362,18 +366,18 @@
         }
 
         .modal-gallery {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            column-count: 2;
+            column-gap: 20px;
         }
 
         .gallery-item {
             width: 100%;
-            /* aspect-ratio removed for gallery */
+            break-inside: avoid;
+            margin-bottom: 20px;
         }
 
         .gallery-item.wide {
-            grid-column: span 2;
+            column-span: all;
         }
 
         .gallery-item img {
@@ -384,11 +388,11 @@
 
         @media(max-width: 768px) {
             .modal-gallery {
-                grid-template-columns: 1fr;
+                column-count: 1;
             }
 
             .gallery-item.wide {
-                grid-column: span 1;
+                column-span: none;
             }
         }
     </style>
