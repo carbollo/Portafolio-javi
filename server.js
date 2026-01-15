@@ -33,29 +33,50 @@ function saveProjects(projects) {
 }
 
 const multer = require('multer');
+const sharp = require('sharp');
+const fs = require('fs'); // Ensure fs is available
 
-// Configure Multer Storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'images/');
-    },
-    filename: (req, file, cb) => {
-        // Keep original extension
-        const ext = path.extname(file.originalname);
-        const name = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_'); // Sanitize filename
-        cb(null, `${name}_${Date.now()}${ext}`);
-    }
-});
+// Ensure images directory exists on startup
+if (!fs.existsSync('images')) {
+    fs.mkdirSync('images');
+}
+
+// Configure Multer (Memory Storage for Sharp processing)
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // API Routes
-app.post('/api/upload', upload.array('files'), (req, res) => {
+app.post('/api/upload', upload.array('files'), async (req, res) => {
     if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: 'No files uploaded' });
     }
-    // Return paths relative to server root (e.g., 'images/file.jpg')
-    const filePaths = req.files.map(f => f.path.replace(/\\/g, '/'));
-    res.json({ paths: filePaths });
+
+    try {
+        const processedPaths = [];
+
+        for (const file of req.files) {
+            // Generate unique filename
+            const name = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9]/g, '_');
+            const filename = `${name}_${Date.now()}.webp`; // Convert to WebP for performance
+            const outputPath = path.join('images', filename);
+
+            // Process with Sharp
+            // Resize to max 1920px width, prevent upscaling, high quality
+            await sharp(file.buffer)
+                .resize(1920, null, { withoutEnlargement: true })
+                .webp({ quality: 85 }) // Good balance of quality/size
+                .toFile(outputPath);
+
+            // Path relative to root for frontend
+            processedPaths.push(`images/${filename}`);
+        }
+
+        res.json({ paths: processedPaths });
+
+    } catch (err) {
+        console.error("Image processing error:", err);
+        res.status(500).json({ error: 'Failed to process images' });
+    }
 });
 
 app.get('/api/projects', (req, res) => {
