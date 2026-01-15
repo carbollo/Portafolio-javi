@@ -124,13 +124,13 @@
             </div>
 
             <div class="form-group">
-                <label>Main Thumbnail URL (Google Drive or Direct Link)</label>
-                <input type="text" id="thumbnail" required placeholder="https://...">
+                <label>Main Thumbnail (Image File)</label>
+                <input type="file" id="thumbnail" accept="image/*" required>
             </div>
 
             <div class="form-group">
-                <label>Gallery Images (One URL per line)</label>
-                <textarea id="gallery" rows="6" placeholder="https://...&#10;https://..."></textarea>
+                <label>Gallery Images (Select multiple)</label>
+                <input type="file" id="gallery" multiple accept="image/*">
             </div>
 
             <button type="submit">Save Project</button>
@@ -152,26 +152,65 @@
         document.getElementById('projectForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const galleryLinks = document.getElementById('gallery').value.split('\n').filter(l => l.trim());
+            const button = e.target.querySelector('button');
+            button.disabled = true;
+            button.textContent = 'Uploading...';
 
-            const project = {
-                title: document.getElementById('title').value,
-                category: document.getElementById('category').value,
-                description: document.getElementById('description').value,
-                thumbnail: document.getElementById('thumbnail').value,
-                gallery: galleryLinks
-            };
+            try {
+                // 1. Upload Thumbnail
+                const thumbInput = document.getElementById('thumbnail');
+                const galleryInput = document.getElementById('gallery');
 
-            const res = await fetch('/api/projects', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(project)
-            });
+                let thumbPath = '';
+                let galleryPaths = [];
 
-            if (res.ok) {
-                document.querySelector('.success-msg').style.display = 'block';
-                e.target.reset();
-                setTimeout(() => document.querySelector('.success-msg').style.display = 'none', 3000);
+                if (thumbInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('files', thumbInput.files[0]);
+
+                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    thumbPath = data.paths[0];
+                }
+
+                if (galleryInput.files.length > 0) {
+                    const formData = new FormData();
+                    for (let i = 0; i < galleryInput.files.length; i++) {
+                        formData.append('files', galleryInput.files[i]);
+                    }
+
+                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    galleryPaths = data.paths;
+                }
+
+                // 2. Save Project
+                const project = {
+                    title: document.getElementById('title').value,
+                    category: document.getElementById('category').value,
+                    description: document.getElementById('description').value,
+                    thumbnail: thumbPath,
+                    gallery: galleryPaths
+                };
+
+                const res = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(project)
+                });
+
+                if (res.ok) {
+                    document.querySelector('.success-msg').textContent = 'Project & Images Saved Successfully!';
+                    document.querySelector('.success-msg').style.display = 'block';
+                    e.target.reset();
+                    setTimeout(() => document.querySelector('.success-msg').style.display = 'none', 3000);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error uploading project');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Save Project';
             }
         });
     </script>

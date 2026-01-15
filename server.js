@@ -27,7 +27,32 @@ function saveProjects(projects) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(projects, null, 2));
 }
 
+const multer = require('multer');
+
+// Configure Multer Storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images/');
+    },
+    filename: (req, file, cb) => {
+        // Keep original extension
+        const ext = path.extname(file.originalname);
+        const name = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_'); // Sanitize filename
+        cb(null, `${name}_${Date.now()}${ext}`);
+    }
+});
+const upload = multer({ storage: storage });
+
 // API Routes
+app.post('/api/upload', upload.array('files'), (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
+    }
+    // Return paths relative to server root (e.g., 'images/file.jpg')
+    const filePaths = req.files.map(f => f.path.replace(/\\/g, '/'));
+    res.json({ paths: filePaths });
+});
+
 app.get('/api/projects', (req, res) => {
     const category = req.query.category;
     let projects = getProjects();
