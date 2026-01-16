@@ -631,3 +631,83 @@ body.custom-cursor-active * {
 .grid-container {
     align-items: start !important;
 }
+
+/* Centralized Marquee / Carousel Animation Styles */
+.featured-carousel {
+    margin-top: 6rem;
+    padding-left: 0;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    /* Mask/Fade edges */
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.carousel-track {
+    display: flex;
+    /* No GAP in flex container - using margin on items for consistent math */
+    gap: 0; 
+    width: max-content;
+    padding-bottom: 2rem;
+    animation: scroll 40s linear infinite;
+    will-change: transform; /* Optimize performance */
+}
+
+.carousel-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Move exactly half the width (assuming 2 sets of items) */
+        transform: translateX(-50%);
+    }
+}
+
+.carousel-item {
+    flex: 0 0 400px;
+    margin-right: 20px; /* Gap replacement */
+    aspect-ratio: 16/9;
+    background: #111;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: opacity 0.3s;
+}
+
+.carousel-item:hover {
+    opacity: 0.8;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover !important; /* Force cover for uniformity in carousel */
+}
+
+.carousel-info {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+.carousel-info h4 {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+    color: #fff;
+}
+
+.carousel-info p {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    letter-spacing: 1px;
+    color: #ccc;
+}
