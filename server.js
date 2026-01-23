@@ -11,7 +11,8 @@ if (!fs.existsSync('images')) {
     fs.mkdirSync('images');
 }
 
-app.use(express.static(path.join(__dirname, '')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.json()); // Enable JSON body parsing
 
 // Data File Path
@@ -119,12 +120,12 @@ app.delete('/api/projects/:id', (req, res) => {
 
 // Admin Route
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(path.join(__dirname, 'dist', 'admin.html'));
 });
 
 // Route for the root path
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Handle clean URLs (e.g., /restauracion -> serves restauracion.html)
@@ -132,7 +133,7 @@ app.get('/:page', (req, res, next) => {
     const page = req.params.page;
     if (page.includes('.')) return next(); // If it has an extension (like .css), skip this handler
 
-    const filePath = path.join(__dirname, `${page}.html`);
+    const filePath = path.join(__dirname, 'dist', `${page}.html`);
     res.sendFile(filePath, (err) => {
         if (err) {
             next(); // If file doesn't exist, go to 404 or next handler

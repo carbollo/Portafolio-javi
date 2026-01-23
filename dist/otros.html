@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INMOBILIARIA | Javier Filmmaker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Syncopate:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+            overflow-x: hidden;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0.9), transparent);
+        }
+
+        .back-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .page-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #F8F4E3;
+        }
+
+
+
+        /* Portfolio Grid */
+        .grid-container {
+            padding: 2rem 4rem 4rem;
+            /* Reduced top padding */
+            max-width: 1600px;
+            margin: 0 auto;
+            column-count: 3;
+            column-gap: 40px;
+        }
+
+        @media(max-width: 1024px) {
+            .grid-container {
+                column-count: 2;
+            }
+        }
+
+        .project-card {
+            position: relative;
+            background: transparent;
+            height: auto;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            break-inside: avoid;
+            margin-bottom: 40px;
+        }
+
+        .project-card:hover {
+            transform: scale(0.98);
+        }
+
+        /* Video/Image Placeholder */
+        .project-media {
+            width: 100%;
+            /* fixed height & cover removed */
+            opacity: 0.8;
+            transition: all 0.5s ease;
+            transform: scale(1.05);
+        }
+
+        .project-card:hover .project-media {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Overlay Info */
+        .project-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .project-card:hover .project-info {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .project-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-cat {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ccc;
+        }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .grid-container {
+                column-count: 1;
+                padding: 6rem 1rem 2rem;
+            }
+
+            header {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1rem;
+            }
+
+            .back-link {
+                /* Back link visible */
+            }
+        }
+    </style>
+    <title>Otros | Javier Filmmaker</title>
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+  <script type="module" crossorigin src="/assets/project-loader-v189iHFJ.js"></script>
+</head>
+
+<body class="portfolio-page">
+    <div class="page-header" style="position: relative; text-align: center; padding: 2rem;">
+        <a href="/" class="back-link" style="position: absolute; left: 2rem; top: 50%; transform: translateY(-50%);">
+            <span class="arrow">←</span> BACK
+        </a>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <h1
+                style="font-family: 'Syncopate', sans-serif; font-size: 1.5rem; letter-spacing: 4px; color: #fff; margin: 0;">
+                ljavissj</h1>
+            <nav style="display: flex; gap: 15px;">
+                <a href="/"
+                    style="color: #ccc; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s;">Portafolio</a>
+                <a href="https://www.instagram.com/ljavissj" target="_blank"
+                    style="color: #ccc; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s;">Instagram</a>
+                <a href="#"
+                    style="color: #ccc; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s;">Contacto</a>
+            </nav>
+        </div>
+        <h1 class="page-title" style="display:none">Otros</h1>
+        <p class="page-subtitle" style="display:none">Proyectos Variados</p>
+    </div>
+
+    <!-- Project Carousel -->
+    <section class="featured-carousel">
+        <div class="carousel-track">
+            <!-- Items loaded dynamically via project-loader.js -->
+        </div>
+    </section>
+
+    <main class="grid-container">
+        <!-- Projects loaded dynamically via project-loader.js -->
+    </main>
+
+    <!-- Project Detail Modal -->
+    <div class="project-modal">
+        <button class="close-modal">✕</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Project Title</h2>
+                <p class="modal-cat">Category / 2024</p>
+                <div class="modal-desc">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                        laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+            </div>
+
+            <div class="modal-gallery">
+                <div class="gallery-item"><img
+                        src="https://images.unsplash.com/photo-1600596542815-2a4d9f6facb8?q=80&w=2069&auto=format&fit=crop">
+                </div>
+                <div class="gallery-item"><img
+                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop">
+                </div>
+                <div class="gallery-item wide"><img
+                        src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop">
+                </div>
+                <div class="gallery-item"><img
+                        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .project-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 200;
+            display: none;
+            opacity: 0;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 210;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        .modal-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .modal-header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .modal-cat {
+            font-family: 'Montserrat', sans-serif;
+            opacity: 0.6;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+
+        .modal-desc {
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .modal-gallery {
+            column-count: 2;
+            column-gap: 20px;
+        }
+
+        .gallery-item {
+            width: 100%;
+            break-inside: avoid;
+            margin-bottom: 20px;
+        }
+
+        .gallery-item.wide {
+            column-span: all;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            /* height & cover removed for gallery */
+            display: block;
+        }
+
+        @media(max-width: 768px) {
+            .modal-gallery {
+                column-count: 1;
+            }
+
+            .gallery-item.wide {
+                column-span: none;
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // Modal Close Logic Only (Opening is handled by loader)
+        const modal = document.querySelector('.project-modal');
+        const closeBtn = document.querySelector('.close-modal');
+
+        closeBtn.addEventListener('click', () => {
+            gsap.to(modal, { opacity: 0, duration: 0.5, onComplete: () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } });
+        });
+    </script>
+</body>
+
+</html>
