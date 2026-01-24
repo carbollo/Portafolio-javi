@@ -104,7 +104,8 @@ app.post('/api/projects', async (req, res) => {
         await newProject.save();
         res.json({ success: true, project: newProject });
     } catch (err) {
-        res.status(500).json({ error: 'Failed to save project' });
+        console.error("Save Error:", err);
+        res.status(500).json({ error: 'Failed to save project: ' + err.message });
     }
 });
 
