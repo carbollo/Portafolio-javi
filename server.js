@@ -49,18 +49,28 @@ const upload = multer({ storage: storage });
 
 // Generate Signature for Client-Side Upload (Bypasses Vercel 4.5MB limit)
 app.get('/api/sign-upload', (req, res) => {
-    const timestamp = Math.round((new Date).getTime() / 1000);
-    const signature = cloudinary.utils.api_sign_request({
-        timestamp: timestamp,
-        folder: 'portfolio'
-    }, process.env.CLOUDINARY_API_SECRET);
+    try {
+        if (!process.env.CLOUDINARY_API_SECRET || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME) {
+            console.error("Missing Cloudinary Env Vars");
+            return res.status(500).json({ error: 'Missing Cloudinary Configuration in Enironment Variables' });
+        }
 
-    res.json({
-        signature,
-        timestamp,
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY
-    });
+        const timestamp = Math.round((new Date).getTime() / 1000);
+        const signature = cloudinary.utils.api_sign_request({
+            timestamp: timestamp,
+            folder: 'portfolio'
+        }, process.env.CLOUDINARY_API_SECRET);
+
+        res.json({
+            signature,
+            timestamp,
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY
+        });
+    } catch (error) {
+        console.error("Signature generation error:", error);
+        res.status(500).json({ error: 'Failed to generate signature: ' + error.message });
+    }
 });
 
 // Deprecated: Server-side upload (Kept just in case, but unused by new admin)

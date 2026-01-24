@@ -241,7 +241,10 @@
                 const uploadToCloudinary = async (file) => {
                     // Get signature
                     const signRes = await fetch('/api/sign-upload');
-                    if (!signRes.ok) throw new Error('Failed to get upload signature');
+                    if (!signRes.ok) {
+                        const errData = await signRes.json().catch(() => ({}));
+                        throw new Error(errData.error || 'Failed to get upload signature (Status ' + signRes.status + ')');
+                    }
                     const signData = await signRes.json();
 
                     // Prepare FormData
