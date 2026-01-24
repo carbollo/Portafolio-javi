@@ -78,15 +78,88 @@ async function loadProjects() {
                 carouselTrack.appendChild(cItem);
             });
 
-            // Setup Infinite Scroll (Cloning) - ONLY if we have many items (> 4)
-            // If we have few items, cloning them looks weird/repetitive.
-            if (carouselProjects.length > 4) {
-                const originalItems = Array.from(carouselTrack.children);
-                originalItems.forEach(item => {
+            // Duplicate items to ensure we have enough for a smooth loop
+            // We want at least 2 full screens worth of items
+
+            let items = Array.from(carouselTrack.children);
+            while (items.length < 10) { // Arbitrary safety number
+                items.forEach(item => {
                     const clone = item.cloneNode(true);
                     carouselTrack.appendChild(clone);
                 });
+                items = Array.from(carouselTrack.children);
             }
+
+            // Anime.js Continuous Scroll
+            // We animate the 'transform' property from 0 to -50% (of total width)
+            // But getting total width dynamically is tricky.
+            // Better approach: Animate each item moving left.
+
+            // Remove CSS Animation class if any
+            carouselTrack.style.animation = 'none';
+            carouselTrack.style.display = 'flex';
+            carouselTrack.style.flexWrap = 'nowrap';
+
+            // Calculate total width of one set (approx) or just animate the track
+            // We will use a simple linear animation on the track
+
+            // Wait for images to load slightly to get widths? 
+            // Or just assume standard width.
+
+            function startMarquee() {
+                const trackWidth = carouselTrack.scrollWidth;
+                // We scroll half the width (assuming we doubled content logic)
+                // Actually, for perfect loop, we scroll until the first clone hits the start position.
+                // Simplified: Scroll endlessly.
+
+                // Anime.js doesn't have a built-in 'infinite marquee' easily without resetting.
+                // We scroll X pixels then reset to 0 instantaneously.
+
+                // Let's assume the first half of children matches the second half.
+                // We scroll exactly half the scrollWidth.
+
+                const distance = trackWidth / 2;
+
+                anime({
+                    targets: carouselTrack,
+                    translateX: [0, -distance],
+                    duration: 40000, // Speed control
+                    easing: 'linear',
+                    loop: true,
+                    // Hover Pause Logic using Anime.js?
+                    // Anime.js doesn't support 'pause on hover' natively easily on the instance.
+                    // We can handle listeners manually.
+                });
+
+                // Add Elastic Hover Effect to Items
+                const cards = carouselTrack.querySelectorAll('.carousel-item');
+                cards.forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        anime({
+                            targets: card,
+                            scale: 1.05,
+                            duration: 800,
+                            elasticity: 400
+                        });
+                        // Optional: Pause marquee?
+                        // document.querySelector('.carousel-track').style.animationPlayState = 'paused'; 
+                        // (Would work if using CSS, but we are using JS. 
+                        // With Anime.js, pausing specific instance is harder if not stored globally.)
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        anime({
+                            targets: card,
+                            scale: 1,
+                            duration: 600,
+                            elasticity: 300
+                        });
+                    });
+                });
+            }
+
+            // Give a moment for DOM to settle
+            setTimeout(startMarquee, 100);
         }
 
         // Re-attach Modal Listeners
