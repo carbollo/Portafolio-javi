@@ -206,7 +206,7 @@ function setupContactModal() {
 
                             <!-- Profile Image (Right) -->
                             <div class="profile-img">
-                                <img src="images/javier-profile.jpg" alt="Javier">
+                                <img src="/images/javier-profile.jpg" alt="Javier">
                             </div>
 
                         </div>
