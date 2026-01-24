@@ -153,6 +153,11 @@ app.get('/:page', (req, res, next) => {
     });
 });
 
+// Explicit 404 for API routes to prevent HTML falling through
+app.use('/api/*', (req, res) => {
+    res.status(404).json({ error: `API route not found: ${req.method} ${req.originalUrl}` });
+});
+
 // Export for Vercel
 module.exports = app;
 
