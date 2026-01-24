@@ -1,48 +1,47 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const app = express();
+require('dotenv').config(); // Load environment variables
 
-// Use the PORT environment variable provided by Railway, or default to 3000 for local testing
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+
+// Use the PORT environment variable provided by Railway/Vercel
 const PORT = process.env.PORT || 3000;
 
-// Ensure images directory exists
-if (!fs.existsSync('images')) {
-    fs.mkdirSync('images');
-}
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.error('MongoDB Connection Error:', err));
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Define Mongoose Schema
+const ProjectSchema = new mongoose.Schema({
+    id: String,
+    title: String,
+    category: String,
+    description: String,
+    thumbnail: String,
+    gallery: [String],
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Project = mongoose.model('Project', ProjectSchema);
+
+app.use('/images', express.static(path.join(__dirname, 'public/images'))); // Serve static images (like profile)
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.json()); // Enable JSON body parsing
 
-// Data File Path
-const DATA_FILE = path.join(__dirname, 'data', 'projects.json');
-
-// Helper to read data
-function getProjects() {
-    try {
-        const data = fs.readFileSync(DATA_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        return [];
-    }
-}
-
-// Helper to save data
-function saveProjects(projects) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(projects, null, 2));
-}
-
 const multer = require('multer');
 const sharp = require('sharp');
-// fs already imported at top by express generator or previous steps
 
-// Ensure images directory exists on startup
-if (!fs.existsSync('images')) {
-    fs.mkdirSync('images');
-}
-
-// Configure Multer (Memory Storage for Sharp processing)
+// Configure Multer (Memory Storage)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -53,26 +52,34 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
     }
 
     try {
-        const processedPaths = [];
+        const processedUrls = [];
 
         for (const file of req.files) {
-            // Generate unique filename
-            const name = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9]/g, '_');
-            const filename = `${name}_${Date.now()}.webp`; // Convert to WebP for performance
-            const outputPath = path.join('images', filename);
+            // Upload to Cloudinary using stream
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'portfolio', resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
 
-            // Process with Sharp
-            // Resize to max 2500px width (better for retina), high quality
-            await sharp(file.buffer)
-                .resize(2500, null, { withoutEnlargement: true })
-                .webp({ quality: 95, lossless: false }) // Very high quality
-                .toFile(outputPath);
+                // Use Sharp to optimize before upload (optional but good for performance)
+                sharp(file.buffer)
+                    .resize(2500, null, { withoutEnlargement: true })
+                    .webp({ quality: 90 })
+                    .toBuffer()
+                    .then(buffer => {
+                        uploadStream.end(buffer);
+                    })
+                    .catch(reject);
+            });
 
-            // Path relative to root for frontend
-            processedPaths.push(`images/${filename}`);
+            processedUrls.push(result.secure_url);
         }
 
-        res.json({ paths: processedPaths });
+        res.json({ paths: processedUrls });
 
     } catch (err) {
         console.error("Image processing error:", err);
@@ -80,42 +87,47 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
     }
 });
 
-app.get('/api/projects', (req, res) => {
-    const category = req.query.category;
-    let projects = getProjects();
-    if (category) {
-        projects = projects.filter(p => p.category.toLowerCase() === category.toLowerCase());
+app.get('/api/projects', async (req, res) => {
+    try {
+        const category = req.query.category;
+        let query = {};
+        if (category) {
+            query.category = { $regex: new RegExp(category, 'i') }; // Case-insensitive
+        }
+
+        const projects = await Project.find(query).sort({ createdAt: -1 });
+        res.json(projects);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch projects' });
     }
-    res.json(projects);
 });
 
-app.post('/api/projects', (req, res) => {
-    const newProject = req.body;
-    const projects = getProjects();
+app.post('/api/projects', async (req, res) => {
+    try {
+        const newProject = new Project({
+            ...req.body,
+            id: Date.now().toString() // Keep custom ID or use _id
+        });
 
-    // Simple ID generation
-    newProject.id = Date.now().toString();
-    projects.push(newProject);
-
-    saveProjects(projects);
-    saveProjects(projects);
-    res.json({ success: true, project: newProject });
+        await newProject.save();
+        res.json({ success: true, project: newProject });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to save project' });
+    }
 });
 
-app.delete('/api/projects/:id', (req, res) => {
-    const id = req.params.id;
-    let projects = getProjects();
-    const initialLength = projects.length;
+app.delete('/api/projects/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await Project.findOneAndDelete({ id: id });
 
-    // Filter out the project with the given ID
-    projects = projects.filter(p => p.id !== id);
-
-    if (projects.length === initialLength) {
-        return res.status(404).json({ error: 'Project not found' });
+        if (!result) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to delete project' });
     }
-
-    saveProjects(projects);
-    res.json({ success: true });
 });
 
 // Admin Route
@@ -141,7 +153,5 @@ app.get('/:page', (req, res, next) => {
     });
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+module.exports = app; // Export app for Vercel
+
