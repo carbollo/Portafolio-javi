@@ -261,7 +261,10 @@
                         body: formData
                     });
 
-                    if (!cloudRes.ok) throw new Error('Cloudinary upload failed');
+                    if (!cloudRes.ok) {
+                        const errorData = await cloudRes.json();
+                        throw new Error('Cloudinary Error: ' + (errorData.error.message || JSON.stringify(errorData)));
+                    }
                     const cloudData = await cloudRes.json();
                     return cloudData.secure_url;
                 };
