@@ -9,10 +9,32 @@ const cloudinary = require('cloudinary').v2;
 // Use the PORT environment variable provided by Railway/Vercel
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error('MongoDB Connection Error:', err));
+// Connect to MongoDB with Serverless Caching Pattern
+let cachedDb = null;
+
+async function connectToDatabase() {
+    if (cachedDb) {
+        return cachedDb;
+    }
+
+    try {
+        console.log("Connecting to MongoDB...");
+        const db = await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 5000, // Fail fast (5s) instead of waiting 30s
+            socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+        });
+
+        console.log("MongoDB Connected Successfully");
+        cachedDb = db;
+        return db;
+    } catch (err) {
+        console.error("MongoDB Connection Logic Error:", err);
+        throw err;
+    }
+}
+
+// Global connection (starts on cold boot, reused if warm)
+connectToDatabase();
 
 // Configure Cloudinary
 cloudinary.config({
@@ -81,6 +103,7 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
 
 app.get('/api/projects', async (req, res) => {
     try {
+        await connectToDatabase(); // Ensure connection
         const category = req.query.category;
         let query = {};
         if (category) {
@@ -96,6 +119,7 @@ app.get('/api/projects', async (req, res) => {
 
 app.post('/api/projects', async (req, res) => {
     try {
+        await connectToDatabase(); // Ensure connection
         const newProject = new Project({
             ...req.body,
             id: Date.now().toString() // Keep custom ID or use _id
@@ -111,6 +135,7 @@ app.post('/api/projects', async (req, res) => {
 
 app.delete('/api/projects/:id', async (req, res) => {
     try {
+        await connectToDatabase(); // Ensure connection
         const id = req.params.id;
         const result = await Project.findOneAndDelete({ id: id });
 
