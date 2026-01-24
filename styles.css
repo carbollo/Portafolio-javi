@@ -669,14 +669,15 @@ body.custom-cursor-active * {
 }
 
 .carousel-item {
-    flex: 0 0 400px;
-    margin-right: 20px; /* Gap replacement */
+    flex: 0 0 280px; /* Reduced from 400px */
+    margin-right: 15px;
     aspect-ratio: 16/9;
     background: #111;
     position: relative;
     cursor: pointer;
     overflow: hidden;
     transition: opacity 0.3s;
+    border-radius: 4px; /* Optional slight roundness */
 }
 
 .carousel-item:hover {
@@ -686,13 +687,13 @@ body.custom-cursor-active * {
 .carousel-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover !important; /* Force cover for uniformity in carousel */
+    object-fit: cover !important;
 }
 
 .carousel-info {
     position: absolute;
-    bottom: 1rem;
-    left: 1rem;
+    bottom: 0.8rem;
+    left: 0.8rem;
     z-index: 2;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     pointer-events: none;
@@ -700,13 +701,13 @@ body.custom-cursor-active * {
 
 .carousel-info h4 {
     font-family: 'Syncopate', sans-serif;
-    font-size: 0.9rem;
-    margin-bottom: 0.2rem;
+    font-size: 0.75rem; /* Reduced from 0.9rem */
+    margin-bottom: 0.1rem;
     color: #fff;
 }
 
 .carousel-info p {
-    font-size: 0.7rem;
+    font-size: 0.6rem; /* Reduced from 0.7rem */
     opacity: 0.8;
     letter-spacing: 1px;
     color: #ccc;
