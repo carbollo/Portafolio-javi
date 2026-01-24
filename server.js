@@ -46,45 +46,27 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // API Routes
+
+// Generate Signature for Client-Side Upload (Bypasses Vercel 4.5MB limit)
+app.get('/api/sign-upload', (req, res) => {
+    const timestamp = Math.round((new Date).getTime() / 1000);
+    const signature = cloudinary.utils.api_sign_request({
+        timestamp: timestamp,
+        folder: 'portfolio'
+    }, process.env.CLOUDINARY_API_SECRET);
+
+    res.json({
+        signature,
+        timestamp,
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY
+    });
+});
+
+// Deprecated: Server-side upload (Kept just in case, but unused by new admin)
 app.post('/api/upload', upload.array('files'), async (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ error: 'No files uploaded' });
-    }
-
-    try {
-        const processedUrls = [];
-
-        for (const file of req.files) {
-            // Upload to Cloudinary using stream
-            const result = await new Promise((resolve, reject) => {
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    { folder: 'portfolio', resource_type: 'auto' },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
-
-                // Use Sharp to optimize before upload (optional but good for performance)
-                sharp(file.buffer)
-                    .resize(2500, null, { withoutEnlargement: true })
-                    .webp({ quality: 90 })
-                    .toBuffer()
-                    .then(buffer => {
-                        uploadStream.end(buffer);
-                    })
-                    .catch(reject);
-            });
-
-            processedUrls.push(result.secure_url);
-        }
-
-        res.json({ paths: processedUrls });
-
-    } catch (err) {
-        console.error("Image processing error:", err);
-        res.status(500).json({ error: 'Failed to process images' });
-    }
+    // ... existing logic if needed, or just specific error msg
+    return res.status(400).json({ error: 'Please use client-side upload' });
 });
 
 app.get('/api/projects', async (req, res) => {

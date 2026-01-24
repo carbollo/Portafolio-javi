@@ -230,31 +230,50 @@
             button.textContent = 'Uploading...';
 
             try {
-                // 1. Upload Thumbnail
+                // 1. Upload Images Directly to Cloudinary (Bypassing Vercel Limit)
                 const thumbInput = document.getElementById('thumbnail');
                 const galleryInput = document.getElementById('gallery');
 
                 let thumbPath = '';
                 let galleryPaths = [];
 
-                if (thumbInput.files.length > 0) {
-                    const formData = new FormData();
-                    formData.append('files', thumbInput.files[0]);
+                // Helper: Upload a single file
+                const uploadToCloudinary = async (file) => {
+                    // Get signature
+                    const signRes = await fetch('/api/sign-upload');
+                    if (!signRes.ok) throw new Error('Failed to get upload signature');
+                    const signData = await signRes.json();
 
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                    const data = await res.json();
-                    thumbPath = data.paths[0];
+                    // Prepare FormData
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('api_key', signData.api_key);
+                    formData.append('timestamp', signData.timestamp);
+                    formData.append('signature', signData.signature);
+                    formData.append('folder', 'portfolio');
+
+                    // Upload
+                    const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/auto/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!cloudRes.ok) throw new Error('Cloudinary upload failed');
+                    const cloudData = await cloudRes.json();
+                    return cloudData.secure_url;
+                };
+
+                if (thumbInput.files.length > 0) {
+                    button.textContent = 'Uploading Thumbnail...';
+                    thumbPath = await uploadToCloudinary(thumbInput.files[0]);
                 }
 
                 if (galleryInput.files.length > 0) {
-                    const formData = new FormData();
                     for (let i = 0; i < galleryInput.files.length; i++) {
-                        formData.append('files', galleryInput.files[i]);
+                        button.textContent = `Uploading Gallery (${i + 1}/${galleryInput.files.length})...`;
+                        const url = await uploadToCloudinary(galleryInput.files[i]);
+                        galleryPaths.push(url);
                     }
-
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                    const data = await res.json();
-                    galleryPaths = data.paths;
                 }
 
                 // 2. Save Project
