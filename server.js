@@ -153,5 +153,13 @@ app.get('/:page', (req, res, next) => {
     });
 });
 
-module.exports = app; // Export app for Vercel
+// Export for Vercel
+module.exports = app;
+
+// Start server only if run directly (Local Dev)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
 
