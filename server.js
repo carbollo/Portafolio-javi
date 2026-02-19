@@ -148,12 +148,13 @@ app.post('/api/projects', async (req, res) => {
     }
 });
 
-// Ocultar / mostrar proyecto (no borra, solo deja de verse en portafolio y en lista del admin)
-app.post('/api/projects/hide', async (req, res) => {
+// Lógica para ocultar/mostrar proyecto (compartida por varias rutas)
+async function setProjectHidden(req, res) {
     try {
         await connectToDatabase();
         const id = (req.body && req.body.id != null ? String(req.body.id).trim() : '') || (req.query && req.query.id) || '';
-        const hidden = !!(req.body && req.body.hidden !== undefined ? req.body.hidden : (req.query && req.query.hidden === 'true'));
+        const hiddenParam = req.body && req.body.hidden !== undefined ? req.body.hidden : req.query.hidden;
+        const hidden = hiddenParam === true || hiddenParam === 'true' || hiddenParam === '1';
         if (!id) return res.status(400).json({ success: false, error: 'Falta el id' });
         const conditions = [{ id: id }];
         if (id.length === 24 && /^[a-f0-9A-F]{24}$/.test(id)) {
@@ -168,7 +169,13 @@ app.post('/api/projects/hide', async (req, res) => {
         console.error('Hide project error:', err);
         res.status(500).json({ success: false, error: 'No se pudo actualizar' });
     }
-});
+}
+
+app.post('/api/projects/hide', setProjectHidden);
+app.get('/api/projects/hide', setProjectHidden);
+// Ruta en español por si el front llama aquí (y GET por compatibilidad)
+app.get('/api/proyectos/ocultar', setProjectHidden);
+app.post('/api/proyectos/ocultar', setProjectHidden);
 
 // Profile (photo + bio) - editable without code changes
 const profilePath = path.join(__dirname, 'data', 'profile.json');

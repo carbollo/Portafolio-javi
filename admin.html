@@ -468,8 +468,9 @@
         async function setHidden(id, hidden) {
             if (!id) return;
             const idStr = String(id).trim();
+            const url = '/api/proyectos/ocultar?id=' + encodeURIComponent(idStr) + '&hidden=' + (hidden ? 'true' : 'false');
             try {
-                const res = await fetch('/api/projects/hide', {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: idStr, hidden: !!hidden })
