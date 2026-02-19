@@ -195,24 +195,36 @@ app.put('/api/portal-order', (req, res) => {
     }
 });
 
-app.delete('/api/projects/:id', async (req, res) => {
+async function doDeleteProject(id) {
+    const sid = (id != null ? String(id) : '').trim();
+    if (!sid) return { ok: false, status: 400, body: { success: false, error: 'Falta el id del proyecto' } };
+    await connectToDatabase();
+    let result = await Project.findOneAndDelete({ id: sid });
+    if (!result && sid.length === 24 && /^[a-f0-9A-F]{24}$/.test(sid)) {
+        try { result = await Project.findByIdAndDelete(sid); } catch (_) {}
+    }
+    if (!result) return { ok: false, status: 404, body: { success: false, error: 'Proyecto no encontrado' } };
+    return { ok: true, status: 200, body: { success: true } };
+}
+
+app.post('/api/projects/delete', async (req, res) => {
     try {
-        await connectToDatabase();
-        const id = (req.params.id || '').trim();
-        if (!id) {
-            return res.status(400).json({ error: 'Project id is required' });
-        }
-        let result = await Project.findOneAndDelete({ id: id });
-        if (!result && mongoose.Types.ObjectId.isValid(id) && String(id).length === 24) {
-            result = await Project.findByIdAndDelete(id);
-        }
-        if (!result) {
-            return res.status(404).json({ error: 'Project not found' });
-        }
-        res.json({ success: true });
+        const id = (req.body && req.body.id != null ? req.body.id : '');
+        const out = await doDeleteProject(id);
+        return res.status(out.status).json(out.body);
     } catch (err) {
         console.error('Delete project error:', err);
-        res.status(500).json({ error: 'Failed to delete project' });
+        return res.status(500).json({ success: false, error: 'No se pudo borrar el proyecto' });
+    }
+});
+
+app.delete('/api/projects/:id', async (req, res) => {
+    try {
+        const out = await doDeleteProject(req.params.id);
+        return res.status(out.status).json(out.body);
+    } catch (err) {
+        console.error('Delete project error:', err);
+        return res.status(500).json({ success: false, error: 'No se pudo borrar el proyecto' });
     }
 });
 

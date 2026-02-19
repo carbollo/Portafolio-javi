@@ -450,18 +450,24 @@
         }
 
         async function deleteProject(id) {
-            if (!confirm('Are you sure you want to delete this project? This cannot be undone.')) return;
+            if (!id) { alert('No hay id del proyecto'); return; }
+            if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
 
             try {
-                const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    loadHistory(); // Refresh list
+                const res = await fetch('/api/projects/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: String(id) })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    loadHistory();
                 } else {
-                    alert('Failed to delete project');
+                    alert(data.error || 'No se pudo borrar el proyecto');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error deleting project');
+                alert('Error al borrar');
             }
         }
 
