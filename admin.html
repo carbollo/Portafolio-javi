@@ -480,11 +480,12 @@
                     loadHistory();
                     if (document.getElementById('hiddenSection').style.display !== 'none') loadHiddenHistory();
                 } else {
-                    alert(data.error || 'No se pudo actualizar');
+                    const msg = data.error || ('Error ' + res.status + (res.status === 404 ? ' – Ruta no encontrada. ¿Desplegaste la última versión?' : ''));
+                    alert(msg);
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error');
+                alert('Error de red: ' + (err.message || err));
             }
         }
 
