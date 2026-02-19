@@ -215,15 +215,17 @@ async function doDeleteProject(id) {
     return { status: 200, body: { success: true } };
 }
 
-app.post('/api/projects/delete', async (req, res) => {
+function handleDeleteRequest(req, res) {
     let id = '';
     try {
-        if (req.body && typeof req.body === 'object' && req.body.id != null) id = req.body.id;
-        if (!id && req.query && req.query.id != null) id = req.query.id;
+        if (req.query && req.query.id != null) id = req.query.id;
+        if (!id && req.body && typeof req.body === 'object' && req.body.id != null) id = req.body.id;
     } catch (_) {}
-    const out = await doDeleteProject(id);
-    res.status(out.status).json(out.body);
-});
+    doDeleteProject(id).then(out => res.status(out.status).json(out.body));
+}
+
+app.get('/api/projects/delete', handleDeleteRequest);
+app.post('/api/projects/delete', handleDeleteRequest);
 
 app.delete('/api/projects/:id', async (req, res) => {
     const out = await doDeleteProject(req.params.id);
