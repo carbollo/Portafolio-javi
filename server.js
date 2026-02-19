@@ -148,7 +148,7 @@ app.post('/api/projects', async (req, res) => {
     }
 });
 
-// Lógica para ocultar/mostrar proyecto (compartida por varias rutas)
+// Ocultar = borrar de la base de datos (el proyecto deja de verse en portafolio y en admin)
 async function setProjectHidden(req, res) {
     try {
         await connectToDatabase();
@@ -160,11 +160,17 @@ async function setProjectHidden(req, res) {
         if (id.length === 24 && /^[a-f0-9A-F]{24}$/.test(id)) {
             try { conditions.push({ _id: new mongoose.Types.ObjectId(id) }); } catch (_) {}
         }
-        const doc = await Project.findOne(conditions.length > 1 ? { $or: conditions } : { id: id });
+        const query = conditions.length > 1 ? { $or: conditions } : { id: id };
+        if (hidden) {
+            const deleted = await Project.findOneAndDelete(query);
+            if (!deleted) return res.status(404).json({ success: false, error: 'Proyecto no encontrado' });
+            return res.json({ success: true, deleted: true });
+        }
+        const doc = await Project.findOne(query);
         if (!doc) return res.status(404).json({ success: false, error: 'Proyecto no encontrado' });
-        doc.hidden = hidden;
+        doc.hidden = false;
         await doc.save();
-        res.json({ success: true, hidden: doc.hidden });
+        res.json({ success: true, hidden: false });
     } catch (err) {
         console.error('Hide project error:', err);
         res.status(500).json({ success: false, error: 'No se pudo actualizar' });
