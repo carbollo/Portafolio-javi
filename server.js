@@ -57,9 +57,17 @@ const ProjectSchema = new mongoose.Schema({
 
 const Project = mongoose.model('Project', ProjectSchema);
 
-app.use('/images', express.static(path.join(__dirname, 'public/images'))); // Serve static images (like profile)
+app.use(express.json()); // Enable JSON body parsing (antes de rutas que usen body)
+
+// Favicon: evitar 404 en logs del navegador
+app.get('/favicon.ico', (req, res) => { res.status(204).end(); });
+app.get('/favicon.png', (req, res) => { res.status(204).end(); });
+
+// Comprobar que la API responde (para logs)
+app.get('/api', (req, res) => { res.json({ ok: true }); });
+
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 app.use(express.static(path.join(__dirname, 'dist')));
-app.use(express.json()); // Enable JSON body parsing
 
 const multer = require('multer');
 const sharp = require('sharp');
@@ -140,6 +148,7 @@ const portalOrderPath = path.join(__dirname, 'data', 'portal-order.json');
 
 function readJsonSafe(filePath, defaultVal) {
     try {
+        if (!fs.existsSync(filePath)) return defaultVal;
         const data = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(data);
     } catch (e) {
