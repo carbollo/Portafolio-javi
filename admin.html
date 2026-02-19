@@ -453,11 +453,12 @@
             if (!id) { alert('No hay id del proyecto'); return; }
             if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
 
+            const idStr = String(id).trim();
             try {
-                const res = await fetch('/api/projects/delete', {
+                const res = await fetch('/api/projects/delete?id=' + encodeURIComponent(idStr), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: String(id) })
+                    body: JSON.stringify({ id: idStr })
                 });
                 const data = await res.json().catch(() => ({}));
                 if (res.ok && data.success) {

@@ -197,35 +197,37 @@ app.put('/api/portal-order', (req, res) => {
 
 async function doDeleteProject(id) {
     const sid = (id != null ? String(id) : '').trim();
-    if (!sid) return { ok: false, status: 400, body: { success: false, error: 'Falta el id del proyecto' } };
-    await connectToDatabase();
-    let result = await Project.findOneAndDelete({ id: sid });
-    if (!result && sid.length === 24 && /^[a-f0-9A-F]{24}$/.test(sid)) {
-        try { result = await Project.findByIdAndDelete(sid); } catch (_) {}
+    if (!sid) return { status: 400, body: { success: false, error: 'Falta el id del proyecto' } };
+    try {
+        await connectToDatabase();
+    } catch (e) {
+        console.error('DB connection on delete:', e);
+        return { status: 500, body: { success: false, error: 'Error de conexión' } };
     }
-    if (!result) return { ok: false, status: 404, body: { success: false, error: 'Proyecto no encontrado' } };
-    return { ok: true, status: 200, body: { success: true } };
+    const conditions = [{ id: sid }];
+    if (sid.length === 24 && /^[a-f0-9A-F]{24}$/.test(sid)) {
+        try {
+            conditions.push({ _id: new mongoose.Types.ObjectId(sid) });
+        } catch (_) {}
+    }
+    const result = await Project.findOneAndDelete(conditions.length > 1 ? { $or: conditions } : { id: sid });
+    if (!result) return { status: 404, body: { success: false, error: 'Proyecto no encontrado' } };
+    return { status: 200, body: { success: true } };
 }
 
 app.post('/api/projects/delete', async (req, res) => {
+    let id = '';
     try {
-        const id = (req.body && req.body.id != null ? req.body.id : '');
-        const out = await doDeleteProject(id);
-        return res.status(out.status).json(out.body);
-    } catch (err) {
-        console.error('Delete project error:', err);
-        return res.status(500).json({ success: false, error: 'No se pudo borrar el proyecto' });
-    }
+        if (req.body && typeof req.body === 'object' && req.body.id != null) id = req.body.id;
+        if (!id && req.query && req.query.id != null) id = req.query.id;
+    } catch (_) {}
+    const out = await doDeleteProject(id);
+    res.status(out.status).json(out.body);
 });
 
 app.delete('/api/projects/:id', async (req, res) => {
-    try {
-        const out = await doDeleteProject(req.params.id);
-        return res.status(out.status).json(out.body);
-    } catch (err) {
-        console.error('Delete project error:', err);
-        return res.status(500).json({ success: false, error: 'No se pudo borrar el proyecto' });
-    }
+    const out = await doDeleteProject(req.params.id);
+    res.status(out.status).json(out.body);
 });
 
 // Admin Route
