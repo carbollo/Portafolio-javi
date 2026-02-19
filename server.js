@@ -52,6 +52,7 @@ const ProjectSchema = new mongoose.Schema({
     description: String,
     thumbnail: String,
     gallery: [String],
+    hidden: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -112,11 +113,17 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
 
 app.get('/api/projects', async (req, res) => {
     try {
-        await connectToDatabase(); // Ensure connection
+        await connectToDatabase();
         const category = req.query.category;
+        const showHidden = req.query.showHidden === '1' || req.query.showHidden === 'true';
         let query = {};
         if (category) {
-            query.category = { $regex: new RegExp(category, 'i') }; // Case-insensitive
+            query.category = { $regex: new RegExp(category, 'i') };
+        }
+        if (!showHidden) {
+            query.hidden = { $ne: true };
+        } else {
+            query.hidden = true;
         }
 
         const projects = await Project.find(query).sort({ createdAt: -1 });
@@ -128,17 +135,38 @@ app.get('/api/projects', async (req, res) => {
 
 app.post('/api/projects', async (req, res) => {
     try {
-        await connectToDatabase(); // Ensure connection
+        await connectToDatabase();
         const newProject = new Project({
             ...req.body,
-            id: Date.now().toString() // Keep custom ID or use _id
+            id: Date.now().toString()
         });
-
         await newProject.save();
         res.json({ success: true, project: newProject });
     } catch (err) {
         console.error("Save Error:", err);
         res.status(500).json({ error: 'Failed to save project: ' + err.message });
+    }
+});
+
+// Ocultar / mostrar proyecto (no borra, solo deja de verse en portafolio y en lista del admin)
+app.post('/api/projects/hide', async (req, res) => {
+    try {
+        await connectToDatabase();
+        const id = (req.body && req.body.id != null ? String(req.body.id).trim() : '') || (req.query && req.query.id) || '';
+        const hidden = !!(req.body && req.body.hidden !== undefined ? req.body.hidden : (req.query && req.query.hidden === 'true'));
+        if (!id) return res.status(400).json({ success: false, error: 'Falta el id' });
+        const conditions = [{ id: id }];
+        if (id.length === 24 && /^[a-f0-9A-F]{24}$/.test(id)) {
+            try { conditions.push({ _id: new mongoose.Types.ObjectId(id) }); } catch (_) {}
+        }
+        const doc = await Project.findOne(conditions.length > 1 ? { $or: conditions } : { id: id });
+        if (!doc) return res.status(404).json({ success: false, error: 'Proyecto no encontrado' });
+        doc.hidden = hidden;
+        await doc.save();
+        res.json({ success: true, hidden: doc.hidden });
+    } catch (err) {
+        console.error('Hide project error:', err);
+        res.status(500).json({ success: false, error: 'No se pudo actualizar' });
     }
 });
 

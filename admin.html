@@ -154,11 +154,20 @@
                 <option value="Creativo">Creativo</option>
                 <option value="Otros">Otros</option>
             </select>
-            <button onclick="loadHistory()" style="margin-top: 10px;">Refresh List</button>
+            <button type="button" onclick="loadHistory()" style="margin-top: 10px;">Actualizar lista</button>
         </div>
+        <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.5rem;">Ocultar = deja de verse en el portafolio y aquí. Puedes recuperarlo en "Ver proyectos ocultos".</p>
 
         <div id="projectList" class="project-list">
             <!-- Items loaded dynamically -->
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="button" id="toggleHiddenBtn" onclick="toggleHiddenList()" style="background: #333; color: #999;">Ver proyectos ocultos</button>
+            <div id="hiddenSection" style="display: none; margin-top: 1rem;">
+                <p style="color: #999; font-size: 0.9rem;">Proyectos ocultos (no se ven en el portafolio). Pulsa "Mostrar" para que vuelvan a verse.</p>
+                <div id="projectListHidden" class="project-list"></div>
+            </div>
         </div>
     </div>
 
@@ -225,18 +234,28 @@
             margin: 0 0 10px 0;
         }
 
-        .delete-btn {
-            background: #ff3333;
+        .hide-btn {
+            background: #b8860b;
+            color: #000;
+            width: 100%;
+            padding: 8px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .hide-btn:hover { background: #daa520; }
+        .show-btn {
+            background: #2d6a2d;
             color: #fff;
             width: 100%;
             padding: 8px;
             font-size: 0.8rem;
-            margin-top: 5px;
+            margin-top: 8px;
+            border: none;
+            cursor: pointer;
         }
-
-        .delete-btn:hover {
-            background: #cc0000;
-        }
+        .show-btn:hover { background: #3d8b3d; }
     </style>
 
     <script>
@@ -420,8 +439,6 @@
                 projects.forEach(p => {
                     const div = document.createElement('div');
                     div.className = 'project-item';
-
-                    // Helper to fix Drive links (Same as frontend, but for admin view)
                     const fixUrl = (url) => {
                         if (url && url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
                             return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
@@ -429,17 +446,16 @@
                         return url || 'https://via.placeholder.com/150';
                     };
                     const thumb = p.thumbnail ? fixUrl(p.thumbnail) : 'https://via.placeholder.com/150';
-
                     const projectId = (p.id != null ? p.id : p._id) != null ? String(p.id != null ? p.id : p._id) : '';
                     div.innerHTML = `
                         <img src="${thumb}" alt="${p.title}">
                         <h4>${p.title}</h4>
                         <p>${p.category}</p>
-                        <button class="delete-btn" type="button" data-project-id="${projectId.replace(/"/g, '&quot;')}">DELETE</button>
+                        <button type="button" class="hide-btn" data-project-id="${(projectId || '').replace(/"/g, '&quot;')}">Ocultar</button>
                     `;
                     container.appendChild(div);
-                    div.querySelector('.delete-btn').addEventListener('click', function () {
-                        deleteProject(this.getAttribute('data-project-id') || '');
+                    div.querySelector('.hide-btn').addEventListener('click', function () {
+                        setHidden(this.getAttribute('data-project-id'), true);
                     });
                 });
 
@@ -449,26 +465,74 @@
             }
         }
 
-        async function deleteProject(id) {
-            if (!id) { alert('No hay id del proyecto'); return; }
-            if (!confirm('¿Borrar este proyecto? No se puede deshacer.')) return;
-
+        async function setHidden(id, hidden) {
+            if (!id) return;
             const idStr = String(id).trim();
             try {
-                const res = await fetch('/api/projects/delete?id=' + encodeURIComponent(idStr), {
+                const res = await fetch('/api/projects/hide', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: idStr })
+                    body: JSON.stringify({ id: idStr, hidden: !!hidden })
                 });
                 const data = await res.json().catch(() => ({}));
                 if (res.ok && data.success) {
                     loadHistory();
+                    if (document.getElementById('hiddenSection').style.display !== 'none') loadHiddenHistory();
                 } else {
-                    alert(data.error || 'No se pudo borrar el proyecto');
+                    alert(data.error || 'No se pudo actualizar');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error al borrar');
+                alert('Error');
+            }
+        }
+
+        function toggleHiddenList() {
+            const section = document.getElementById('hiddenSection');
+            const btn = document.getElementById('toggleHiddenBtn');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                btn.textContent = 'Ocultar lista de ocultos';
+                loadHiddenHistory();
+            } else {
+                section.style.display = 'none';
+                btn.textContent = 'Ver proyectos ocultos';
+            }
+        }
+
+        async function loadHiddenHistory() {
+            const container = document.getElementById('projectListHidden');
+            container.innerHTML = '<p style="grid-column: 1/-1;">Cargando...</p>';
+            try {
+                const res = await fetch('/api/projects?showHidden=1');
+                const projects = await res.json();
+                container.innerHTML = '';
+                if (projects.length === 0) {
+                    container.innerHTML = '<p style="grid-column: 1/-1; color: #666;">No hay proyectos ocultos.</p>';
+                    return;
+                }
+                const fixUrl = (url) => {
+                    if (url && url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview')))
+                        return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
+                    return url || 'https://via.placeholder.com/150';
+                };
+                projects.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'project-item';
+                    const projectId = (p.id != null ? p.id : p._id) != null ? String(p.id != null ? p.id : p._id) : '';
+                    div.innerHTML = `
+                        <img src="${p.thumbnail ? fixUrl(p.thumbnail) : 'https://via.placeholder.com/150'}" alt="${p.title}">
+                        <h4>${p.title}</h4>
+                        <p>${p.category}</p>
+                        <button type="button" class="show-btn" data-project-id="${(projectId || '').replace(/"/g, '&quot;')}">Mostrar</button>
+                    `;
+                    container.appendChild(div);
+                    div.querySelector('.show-btn').addEventListener('click', function () {
+                        setHidden(this.getAttribute('data-project-id'), false);
+                    });
+                });
+            } catch (err) {
+                container.innerHTML = '<p style="color:red;">Error al cargar.</p>';
             }
         }
 
