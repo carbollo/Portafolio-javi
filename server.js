@@ -173,7 +173,8 @@ async function setProjectHidden(req, res) {
         res.json({ success: true, hidden: false });
     } catch (err) {
         console.error('Hide project error:', err);
-        res.status(500).json({ success: false, error: 'No se pudo actualizar' });
+        const msg = err && err.message ? err.message : 'No se pudo actualizar';
+        res.status(500).json({ success: false, error: msg });
     }
 }
 
