@@ -430,13 +430,17 @@
                     };
                     const thumb = p.thumbnail ? fixUrl(p.thumbnail) : 'https://via.placeholder.com/150';
 
+                    const projectId = (p.id != null ? p.id : p._id) != null ? String(p.id != null ? p.id : p._id) : '';
                     div.innerHTML = `
                         <img src="${thumb}" alt="${p.title}">
                         <h4>${p.title}</h4>
                         <p>${p.category}</p>
-                        <button class="delete-btn" onclick="deleteProject('${(p.id || p._id || '').toString().replace(/'/g, "\\'")}')">DELETE</button>
+                        <button class="delete-btn" type="button" data-project-id="${projectId.replace(/"/g, '&quot;')}">DELETE</button>
                     `;
                     container.appendChild(div);
+                    div.querySelector('.delete-btn').addEventListener('click', function () {
+                        deleteProject(this.getAttribute('data-project-id') || '');
+                    });
                 });
 
             } catch (err) {

@@ -197,11 +197,13 @@ app.put('/api/portal-order', (req, res) => {
 
 app.delete('/api/projects/:id', async (req, res) => {
     try {
-        await connectToDatabase(); // Ensure connection
-        const id = req.params.id;
+        await connectToDatabase();
+        const id = (req.params.id || '').trim();
+        if (!id) {
+            return res.status(400).json({ error: 'Project id is required' });
+        }
         let result = await Project.findOneAndDelete({ id: id });
-        if (!result && id.length >= 20) {
-            // Fallback: delete by MongoDB _id (e.g. when id was never set on old docs)
+        if (!result && mongoose.Types.ObjectId.isValid(id) && String(id).length === 24) {
             result = await Project.findByIdAndDelete(id);
         }
         if (!result) {
@@ -209,6 +211,7 @@ app.delete('/api/projects/:id', async (req, res) => {
         }
         res.json({ success: true });
     } catch (err) {
+        console.error('Delete project error:', err);
         res.status(500).json({ error: 'Failed to delete project' });
     }
 });
