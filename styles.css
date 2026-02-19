@@ -489,7 +489,7 @@ body.custom-cursor-active * {
 
 .portal-card[data-theme="commercial"]:hover {
     border-color: var(--comm-color);
-    box-shadow: 0 0 20px var(--comm-color), inset 0 0 20px var(--comm-color);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.35), inset 0 0 8px rgba(0, 255, 0, 0.15);
 }
 
 .portal-card[data-theme="commercial"]:hover .portal-title {

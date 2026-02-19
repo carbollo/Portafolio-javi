@@ -72,29 +72,22 @@
 
 
 
-        /* Portfolio Grid */
+        /* Portfolio Grid (mismo que el resto de secciones: recuadros en columnas) */
         .grid-container {
             padding: 2rem 4rem 4rem;
-            /* Reduced top padding */
             max-width: 1600px;
             margin: 0 auto;
+            column-count: 3;
+            column-gap: 40px;
+        }
 
+        @media(max-width: 1024px) {
             .grid-container {
-                padding: 2rem 4rem 4rem;
-                /* Reduced top padding */
-                max-width: 1600px;
-                margin: 0 auto;
-                column-count: 3;
-                column-gap: 40px;
+                column-count: 2;
             }
+        }
 
-            @media(max-width: 1024px) {
-                .grid-container {
-                    column-count: 2;
-                }
-            }
-
-            .project-card {
+        .project-card {
                 position: relative;
                 background: transparent;
                 height: auto;
@@ -139,8 +132,6 @@
             .project-card:hover .project-info {
                 transform: translateY(0);
                 opacity: 1;
-                transform: translateY(0);
-                opacity: 1;
             }
 
             .project-title {
@@ -156,22 +147,21 @@
                 color: #ccc;
             }
 
-            /* Responsive */
-            @media(max-width: 768px) {
-                .grid-container {
-                    column-count: 1;
-                    padding: 6rem 1rem 2rem;
-                }
-
-                header {
-                    padding: 1.5rem;
-                }
-
-                .page-title {
-                    font-size: 1rem;
-                }
-
+        /* Responsive */
+        @media(max-width: 768px) {
+            .grid-container {
+                column-count: 1;
+                padding: 6rem 1rem 2rem;
             }
+
+            header {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 

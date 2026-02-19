@@ -162,6 +162,35 @@
         </div>
     </div>
 
+    <!-- Portal order: organize feeds on home -->
+    <div class="container" style="margin-top: 4rem; border-top: 1px solid #333; padding-top: 3rem;">
+        <h1>Orden de secciones (portada)</h1>
+        <p style="color: #999; font-size: 0.9rem; margin-bottom: 1rem;">Orden en que aparecen Moda, Conciertos, etc. en la portada. Arriba = primero.</p>
+        <ul id="portalOrderList" style="list-style: none; padding: 0;"></ul>
+        <button type="button" onclick="savePortalOrder()" style="margin-top: 10px;">Guardar orden</button>
+        <span id="portalOrderMsg" style="color: #0f0; margin-left: 1rem; display: none;">Guardado.</span>
+    </div>
+
+    <!-- Profile: photo + bio (editable without code) -->
+    <div class="container" style="margin-top: 4rem; border-top: 1px solid #333; padding-top: 3rem;">
+        <h1>Perfil (Contacto / Sobre mí)</h1>
+        <p style="color: #999; font-size: 0.9rem; margin-bottom: 1rem;">Foto de perfil y texto del modal Contacto. Cambia aquí para no tocar código.</p>
+        <div class="form-group">
+            <label>URL de la foto de perfil</label>
+            <input type="text" id="profileImageUrl" placeholder="/images/javier-profile.jpg o URL Cloudinary">
+        </div>
+        <div class="form-group">
+            <label>Texto sobre mí (párrafos separados por línea en blanco)</label>
+            <textarea id="profileBio" rows="10"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Email (para el botón Contacto)</label>
+            <input type="text" id="profileEmail" placeholder="tu@email.com">
+        </div>
+        <button type="button" onclick="saveProfile()">Guardar perfil</button>
+        <span id="profileMsg" style="color: #0f0; margin-left: 1rem; display: none;">Guardado.</span>
+    </div>
+
     <style>
         .project-list {
             display: grid;
@@ -216,7 +245,9 @@
             // Simple client-side check (Not secure, but sufficient for basic obscuring)
             if (pass === 'javier123') {
                 document.getElementById('auth-overlay').style.display = 'none';
-                loadHistory(); // Load initial history
+                loadHistory();
+                loadPortalOrder();
+                loadProfile();
             } else {
                 alert('Wrong password');
             }
@@ -403,7 +434,7 @@
                         <img src="${thumb}" alt="${p.title}">
                         <h4>${p.title}</h4>
                         <p>${p.category}</p>
-                        <button class="delete-btn" onclick="deleteProject('${p.id}')">DELETE</button>
+                        <button class="delete-btn" onclick="deleteProject('${(p.id || p._id || '').toString().replace(/'/g, "\\'")}')">DELETE</button>
                     `;
                     container.appendChild(div);
                 });
@@ -427,6 +458,77 @@
             } catch (err) {
                 console.error(err);
                 alert('Error deleting project');
+            }
+        }
+
+        let portalOrder = [];
+        async function loadPortalOrder() {
+            try {
+                const res = await fetch('/api/portal-order');
+                portalOrder = await res.json();
+                if (!Array.isArray(portalOrder)) portalOrder = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
+                renderPortalOrder();
+            } catch (e) {
+                portalOrder = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
+                renderPortalOrder();
+            }
+        }
+        function renderPortalOrder() {
+            const ul = document.getElementById('portalOrderList');
+            ul.innerHTML = portalOrder.map((name, i) => `
+                <li style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="min-width:140px;">${name}</span>
+                    <button type="button" onclick="movePortal(${i}, -1)" ${i === 0 ? 'disabled' : ''}>↑</button>
+                    <button type="button" onclick="movePortal(${i}, 1)" ${i === portalOrder.length - 1 ? 'disabled' : ''}>↓</button>
+                </li>
+            `).join('');
+        }
+        function movePortal(index, delta) {
+            const j = index + delta;
+            if (j < 0 || j >= portalOrder.length) return;
+            [portalOrder[index], portalOrder[j]] = [portalOrder[j], portalOrder[index]];
+            renderPortalOrder();
+        }
+        async function savePortalOrder() {
+            try {
+                const res = await fetch('/api/portal-order', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(portalOrder) });
+                if (res.ok) {
+                    document.getElementById('portalOrderMsg').style.display = 'inline';
+                    setTimeout(() => document.getElementById('portalOrderMsg').style.display = 'none', 2000);
+                } else alert('Error al guardar');
+            } catch (e) {
+                alert('Error al guardar orden');
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch('/api/profile');
+                const p = await res.json();
+                document.getElementById('profileImageUrl').value = p.profileImageUrl || '';
+                document.getElementById('profileBio').value = p.bio || '';
+                document.getElementById('profileEmail').value = p.email || '';
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        async function saveProfile() {
+            try {
+                const res = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        profileImageUrl: document.getElementById('profileImageUrl').value.trim() || '/images/javier-profile.jpg',
+                        bio: document.getElementById('profileBio').value.trim(),
+                        email: document.getElementById('profileEmail').value.trim()
+                    })
+                });
+                if (res.ok) {
+                    document.getElementById('profileMsg').style.display = 'inline';
+                    setTimeout(() => document.getElementById('profileMsg').style.display = 'none', 2000);
+                } else alert('Error al guardar');
+            } catch (e) {
+                alert('Error al guardar perfil');
             }
         }
     </script>

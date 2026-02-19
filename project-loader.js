@@ -8,9 +8,7 @@ async function loadProjects() {
     try {
         const response = await fetch(`/api/projects?category=${cleanCategory}`);
         const projects = await response.json();
-
-        // Sort: Newest first (assuming pushed in chronological order, so just reverse)
-        projects.reverse();
+        // API returns newest first (createdAt -1), keep that order: newest arriba, más antiguos abajo
 
         const grid = document.querySelector('.grid-container');
         const carouselTrack = document.querySelector('.carousel-track');
@@ -253,8 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupContactModal();
 });
 
-function setupContactModal() {
-    // 1. Inject Modal HTML if not exists
+async function setupContactModal() {
+    // 1. Inject Modal HTML if not exists (content filled from /api/profile below)
     if (!document.getElementById('contact-modal')) {
         const modalHTML = `
             <div id="contact-modal" class="project-modal" style="z-index: 250;">
@@ -263,25 +261,15 @@ function setupContactModal() {
                     <div class="modal-header">
                         <h2 class="modal-title" style="text-align: center; margin-bottom: 3rem;">SOBRE MÍ</h2>
                         <div class="about-container">
-                            
-                            <!-- Bio Text & Links (Left) -->
                             <div class="about-text">
-                                <div class="modal-desc">
-                                    <p>Dejar atrás mis estudios y mi trabajo estable para dedicarme por completo a la fotografía fue la decisión más arriesgada y acertada de mi vida. Hoy, esa pasión se traduce en una mirada que no se conforma con lo convencional, buscando siempre la máxima expresión en la moda y los conciertos. Me muevo entre la elegancia de una editorial y la energía cruda del escenario, adaptando mi técnica a lo que cada historia necesita.</p>
-                                    <p style="margin-top: 1rem;">Mi objetivo principal es que, al trabajar juntos, sientas la tranquilidad absoluta de que cualquier reto técnico o logístico estará bajo control. Me especializo en traducir visiones complejas en imágenes potentes, asegurando que el mensaje que quieres transmitir llegue al espectador con total claridad. No solo capturo momentos; gestiono cada detalle del proceso creativo para que tú solo tengas que preocuparte de disfrutar del resultado final.</p>
-                                    <p style="margin-top: 1rem;">Soy ese perfil híbrido que combina la disciplina con una actitud disruptiva y cercana para romper los moldes establecidos. Si buscas una estética impecable y un fotógrafo que resuelva problemas de forma creativa, estoy listo para empezar.</p>
-                                </div>
-                                <!-- Email/Socials -->
+                                <div class="modal-desc contact-modal-desc"><p>Cargando...</p></div>
                                 <div class="contact-links" style="margin-top: 2rem;">
-                                    <a href="mailto:Ljavi141@gmail.com" class="contact-btn">Email Me</a>
+                                    <a href="#" class="contact-btn" id="contact-email-btn">Email Me</a>
                                 </div>
                             </div>
-
-                            <!-- Profile Image (Right) -->
                             <div class="profile-img">
-                                <img src="/images/javier-profile.jpg" alt="Javier">
+                                <img id="contact-profile-img" src="/images/javier-profile.jpg" alt="Javier">
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -364,6 +352,33 @@ function setupContactModal() {
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    // Fill profile from API (so you can change photo and text without touching code)
+    try {
+        const profileRes = await fetch('/api/profile');
+        const profile = profileRes.ok ? await profileRes.json() : null;
+        if (profile) {
+            const img = document.getElementById('contact-profile-img');
+            const descEl = document.querySelector('.contact-modal-desc');
+            const emailBtn = document.getElementById('contact-email-btn');
+            if (img) img.src = profile.profileImageUrl || img.src;
+            if (descEl) {
+                const paragraphs = (profile.bio || '')
+                    .split(/\n\n+/)
+                    .map(p => p.trim())
+                    .filter(Boolean);
+                descEl.innerHTML = paragraphs.length
+                    ? paragraphs.map((p, i) => `<p${i > 0 ? ' style="margin-top: 1rem;"' : ''}>${p}</p>`).join('')
+                    : '<p>' + (profile.bio || '') + '</p>';
+            }
+            if (emailBtn) {
+                emailBtn.href = 'mailto:' + (profile.email || '').replace(/^mailto:/i, '');
+                if (profile.emailLabel) emailBtn.textContent = profile.emailLabel;
+            }
+        }
+    } catch (e) {
+        console.error('Error loading profile:', e);
     }
 
     // 2. Logic

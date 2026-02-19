@@ -1,18 +1,25 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // 1. Portal order: apply your saved order so feeds appear as you organized them
+        const orderRes = await fetch('/api/portal-order');
+        const order = orderRes.ok ? await orderRes.json() : ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
+        const container = document.querySelector('.portals-container');
+        if (container && Array.isArray(order) && order.length) {
+            const cards = Array.from(document.querySelectorAll('.portal-card'));
+            const sorted = order
+                .map(name => cards.find(c => (c.getAttribute('href') || '').toLowerCase() === name.toLowerCase()))
+                .filter(Boolean);
+            sorted.forEach(card => container.appendChild(card));
+        }
+
         const response = await fetch('/api/projects');
         const projects = await response.json();
+        // API already returns newest first (createdAt -1), so first match = newest = "última" por categoría
 
-        // Sort by newest
-        projects.reverse();
-
-        // Map categories to their latest project thumbnail
+        // Map categories to their latest (newest) project thumbnail for portal covers
         const categoryImages = {};
-
-        // Allowed categories matching the HTML hrefs/data-text
         const categories = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
 
-        // Helper to fix Drive links (Shared logic)
         const fixUrl = (url) => {
             if (url && url.includes('drive.google.com') && (url.includes('/view') || url.includes('/preview'))) {
                 return url.replace(/\/file\/d\/(.+)\/(view|preview).*/, '/uc?export=view&id=$1');
@@ -27,24 +34,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // Apply to Portals
         const portals = document.querySelectorAll('.portal-card');
         portals.forEach(portal => {
-            // Get category name from the title text inside
             const title = portal.querySelector('.portal-title').textContent.trim();
-            // Or fallback to href logic if titles are styled differently
-            // We use the exact string match from our array above.
-
-            // Normalize slightly to match keys (e.g. "GASTRONOMIA" -> "Gastronomia")
-            // Helper to Title Case
             const key = categories.find(c => c.toUpperCase() === title.toUpperCase());
-
             if (key && categoryImages[key]) {
-                // Set CSS variable for hover effect
                 portal.style.setProperty('--hover-bg', `url('${categoryImages[key]}')`);
             }
         });
-
     } catch (e) {
         console.error('Error loading home backgrounds:', e);
     }
