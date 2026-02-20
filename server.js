@@ -149,34 +149,50 @@ app.post('/api/projects', async (req, res) => {
 });
 
 // Ocultar = borrar de la base de datos (el proyecto deja de verse en portafolio y en admin)
+// Ocultar = BORRAR de la base de datos permanentemente (Hard Delete)
 async function setProjectHidden(req, res) {
     try {
         await connectToDatabase();
         const id = (req.body && req.body.id != null ? String(req.body.id).trim() : '') || (req.query && req.query.id) || '';
+        // El parámetro 'hidden' ya no importa tanto si el objetivo es siempre borrar cuando se llama a esta función con hidden=true
+        // Pero mantenemos la lógica por si acaso se llama para 'desocultar' (aunque si se borra, no se puede desocultar)
         const hiddenParam = req.body && req.body.hidden !== undefined ? req.body.hidden : req.query.hidden;
-        const hidden = hiddenParam === true || hiddenParam === 'true' || hiddenParam === '1';
+        const shouldDelete = hiddenParam === true || hiddenParam === 'true' || hiddenParam === '1';
+
         if (!id) return res.status(400).json({ success: false, error: 'Falta el id' });
+
         const conditions = [{ id: id }];
         if (id.length === 24 && /^[a-f0-9A-F]{24}$/.test(id)) {
-            try { conditions.push({ _id: new mongoose.Types.ObjectId(id) }); } catch (_) {}
+            try { conditions.push({ _id: new mongoose.Types.ObjectId(id) }); } catch (_) { }
         }
         const query = conditions.length > 1 ? { $or: conditions } : { id: id };
-        if (hidden) {
+
+        if (shouldDelete) {
+            console.log(`Intentando borrar proyecto con query: ${JSON.stringify(query)}`);
             const deleted = await Project.findOneAndDelete(query);
-            if (!deleted) return res.status(404).json({ success: false, error: 'Proyecto no encontrado' });
+            if (!deleted) {
+                console.log('No se encontró el proyecto para borrar');
+                return res.status(404).json({ success: false, error: 'Proyecto no encontrado para eliminar' });
+            }
+            console.log('Proyecto borrado correctamente');
             return res.json({ success: true, deleted: true });
         }
+
+        // Si por alguna razón se llama con hidden=false, intentamos recuperar (aunque si se borró antes, esto fallará)
         const doc = await Project.findOne(query);
         if (!doc) return res.status(404).json({ success: false, error: 'Proyecto no encontrado' });
         doc.hidden = false;
         await doc.save();
         res.json({ success: true, hidden: false });
+
     } catch (err) {
-        console.error('Hide project error:', err);
-        const msg = err && err.message ? err.message : 'No se pudo actualizar';
-        res.status(500).json({ success: false, error: msg });
+        console.error('SERVER ERROR in setProjectHidden:', err);
+        // Devolvemos el error real para depurar
+        res.status(500).json({ success: false, error: 'DB Error: ' + err.message });
     }
 }
+
+
 
 app.post('/api/projects/hide', setProjectHidden);
 app.get('/api/projects/hide', setProjectHidden);
@@ -259,7 +275,7 @@ async function doDeleteProject(id) {
     if (sid.length === 24 && /^[a-f0-9A-F]{24}$/.test(sid)) {
         try {
             conditions.push({ _id: new mongoose.Types.ObjectId(sid) });
-        } catch (_) {}
+        } catch (_) { }
     }
     const result = await Project.findOneAndDelete(conditions.length > 1 ? { $or: conditions } : { id: sid });
     if (!result) return { status: 404, body: { success: false, error: 'Proyecto no encontrado' } };
@@ -271,7 +287,7 @@ function handleDeleteRequest(req, res) {
     try {
         if (req.query && req.query.id != null) id = req.query.id;
         if (!id && req.body && typeof req.body === 'object' && req.body.id != null) id = req.body.id;
-    } catch (_) {}
+    } catch (_) { }
     doDeleteProject(id).then(out => res.status(out.status).json(out.body));
 }
 
