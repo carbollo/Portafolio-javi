@@ -58,6 +58,18 @@ const ProjectSchema = new mongoose.Schema({
 
 const Project = mongoose.model('Project', ProjectSchema);
 
+const ProfileSchema = new mongoose.Schema({
+    profileImageUrl: String,
+    bio: String,
+    email: String
+}, { collection: 'profile', strict: false });
+const Profile = mongoose.model('Profile', ProfileSchema);
+
+const PortalOrderSchema = new mongoose.Schema({
+    order: [String]
+}, { collection: 'portalorder' });
+const PortalOrder = mongoose.model('PortalOrder', PortalOrderSchema);
+
 app.use(express.json()); // Enable JSON body parsing (antes de rutas que usen body)
 
 // Favicon: evitar 404 en logs del navegador
@@ -200,65 +212,67 @@ app.get('/api/projects/hide', setProjectHidden);
 app.get('/api/proyectos/ocultar', setProjectHidden);
 app.post('/api/proyectos/ocultar', setProjectHidden);
 
-// Profile (photo + bio) - editable without code changes
-const profilePath = path.join(__dirname, 'data', 'profile.json');
-const portalOrderPath = path.join(__dirname, 'data', 'portal-order.json');
+// Profile (photo + bio) - guardado en MongoDB para que funcione en Vercel (sin escribir archivos)
+const defaultProfile = {
+    profileImageUrl: '/images/javier-profile.jpg',
+    bio: 'Dejar atrás mis estudios y mi trabajo estable para dedicarme por completo a la fotografía fue la decisión más arriesgada y acertada de mi vida. Hoy, esa pasión se traduce en una mirada que no se conforma con lo convencional, buscando siempre la máxima expresión en la moda y los conciertos. Me muevo entre la elegancia de una editorial y la energía cruda del escenario, adaptando mi técnica a lo que cada historia necesita.\n\nMi objetivo principal es que, al trabajar juntos, sientas la tranquilidad absoluta de que cualquier reto técnico o logístico estará bajo control. Me especializo en traducir visiones complejas en imágenes potentes, asegurando que el mensaje que quieres transmitir llegue al espectador con total claridad. No solo capturo momentos; gestiono cada detalle del proceso creativo para que tú solo tengas que preocuparte de disfrutar del resultado final.\n\nSoy ese perfil híbrido que combina la disciplina con una actitud disruptiva y cercana para romper los moldes establecidos. Si buscas una estética impecable y un fotógrafo que resuelva problemas de forma creativa, estoy listo para empezar.',
+    email: 'Ljavi141@gmail.com'
+};
 
-function readJsonSafe(filePath, defaultVal) {
+app.get('/api/profile', async (req, res) => {
     try {
-        if (!fs.existsSync(filePath)) return defaultVal;
-        const data = fs.readFileSync(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (e) {
-        return defaultVal;
-    }
-}
-
-app.get('/api/profile', (req, res) => {
-    try {
-        const defaultProfile = {
-            profileImageUrl: '/images/javier-profile.jpg',
-            bio: 'Dejar atrás mis estudios y mi trabajo estable para dedicarme por completo a la fotografía fue la decisión más arriesgada y acertada de mi vida. Hoy, esa pasión se traduce en una mirada que no se conforma con lo convencional, buscando siempre la máxima expresión en la moda y los conciertos. Me muevo entre la elegancia de una editorial y la energía cruda del escenario, adaptando mi técnica a lo que cada historia necesita.\n\nMi objetivo principal es que, al trabajar juntos, sientas la tranquilidad absoluta de que cualquier reto técnico o logístico estará bajo control. Me especializo en traducir visiones complejas en imágenes potentes, asegurando que el mensaje que quieres transmitir llegue al espectador con total claridad. No solo capturo momentos; gestiono cada detalle del proceso creativo para que tú solo tengas que preocuparte de disfrutar del resultado final.\n\nSoy ese perfil híbrido que combina la disciplina con una actitud disruptiva y cercana para romper los moldes establecidos. Si buscas una estética impecable y un fotógrafo que resuelva problemas de forma creativa, estoy listo para empezar.',
-            email: 'Ljavi141@gmail.com'
-        };
-        const profile = readJsonSafe(profilePath, defaultProfile);
-        res.json(profile);
+        await connectToDatabase();
+        const doc = await Profile.findOne();
+        if (!doc) return res.json(defaultProfile);
+        res.json({
+            profileImageUrl: doc.profileImageUrl || defaultProfile.profileImageUrl,
+            bio: doc.bio != null ? doc.bio : defaultProfile.bio,
+            email: doc.email || defaultProfile.email
+        });
     } catch (err) {
-        res.status(500).json({ error: 'Failed to load profile' });
+        console.error('GET profile:', err);
+        res.json(defaultProfile);
     }
 });
 
-app.put('/api/profile', (req, res) => {
+app.put('/api/profile', async (req, res) => {
     try {
-        const dir = path.dirname(profilePath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(profilePath, JSON.stringify(req.body, null, 2), 'utf8');
+        await connectToDatabase();
+        await Profile.findOneAndUpdate(
+            {},
+            { profileImageUrl: req.body.profileImageUrl, bio: req.body.bio, email: req.body.email },
+            { upsert: true, new: true }
+        );
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: 'Failed to save profile' });
+        console.error('PUT profile:', err);
+        res.status(500).json({ error: err.message || 'Error al guardar perfil' });
     }
 });
 
-// Portal/feed order - so you can reorder categories on home
-app.get('/api/portal-order', (req, res) => {
+// Portal/feed order - guardado en MongoDB para Vercel
+const defaultPortalOrder = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
+
+app.get('/api/portal-order', async (req, res) => {
     try {
-        const defaultOrder = ['Moda', 'Conciertos', 'Gastronomia', 'Creativo', 'Otros'];
-        const order = readJsonSafe(portalOrderPath, defaultOrder);
-        res.json(order);
+        await connectToDatabase();
+        const doc = await PortalOrder.findOne();
+        if (!doc || !Array.isArray(doc.order) || doc.order.length === 0) return res.json(defaultPortalOrder);
+        res.json(doc.order);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to load portal order' });
+        res.json(defaultPortalOrder);
     }
 });
 
-app.put('/api/portal-order', (req, res) => {
+app.put('/api/portal-order', async (req, res) => {
     try {
-        const dir = path.dirname(portalOrderPath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        const order = Array.isArray(req.body) ? req.body : (req.body.order || []);
-        fs.writeFileSync(portalOrderPath, JSON.stringify(order, null, 2), 'utf8');
+        await connectToDatabase();
+        const order = Array.isArray(req.body) ? req.body : (req.body && req.body.order) || [];
+        await PortalOrder.findOneAndUpdate({}, { order }, { upsert: true });
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: 'Failed to save portal order' });
+        console.error('PUT portal-order:', err);
+        res.status(500).json({ error: 'Error al guardar orden' });
     }
 });
 
