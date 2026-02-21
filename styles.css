@@ -499,7 +499,7 @@ body.custom-cursor-active * {
 
 .portal-card[data-theme="docu"]:hover {
     border-color: var(--docu-color);
-    background: rgba(193, 154, 107, 0.2);
+    background-color: rgba(193, 154, 107, 0.25);
 }
 
 .portal-card[data-theme="docu"]:hover .portal-title {
@@ -508,7 +508,7 @@ body.custom-cursor-active * {
 
 .portal-card[data-theme="music"]:hover {
     border-color: var(--music-color);
-    background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.2));
+    background-color: rgba(255, 0, 255, 0.2);
 }
 
 .portal-card[data-theme="music"]:hover .portal-title {
