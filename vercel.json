@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/api/proyectos/ocultar", "destination": "/api/proyectos/ocultar" },
+    { "source": "/api/profile", "destination": "/api/profile" },
     { "source": "/api/(.*)", "destination": "/api/index.js" },
     { "source": "/conciertos", "destination": "/conciertos.html" },
     { "source": "/moda", "destination": "/moda.html" },

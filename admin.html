@@ -600,12 +600,15 @@
                         email: document.getElementById('profileEmail').value.trim()
                     })
                 });
-                if (res.ok) {
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
                     document.getElementById('profileMsg').style.display = 'inline';
                     setTimeout(() => document.getElementById('profileMsg').style.display = 'none', 2000);
-                } else alert('Error al guardar');
+                } else {
+                    alert(data.error || ('Error ' + res.status + ' al guardar'));
+                }
             } catch (e) {
-                alert('Error al guardar perfil');
+                alert('Error al guardar: ' + (e.message || e));
             }
         }
     </script>

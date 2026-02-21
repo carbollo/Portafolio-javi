@@ -341,10 +341,14 @@ app.use('/api/*', (req, res) => {
     res.status(404).json({ error: `API route not found: ${req.method} ${req.originalUrl}` });
 });
 
-// Export for Vercel (y para que api/proyectos/ocultar.js pueda usar modelo y conexión)
+// Export for Vercel (y para api/proyectos/ocultar.js y api/profile.js)
 module.exports = app;
 app.Project = Project;
+app.Profile = Profile;
+app.PortalOrder = PortalOrder;
 app.connectToDatabase = connectToDatabase;
+app.defaultProfile = defaultProfile;
+app.defaultPortalOrder = defaultPortalOrder;
 
 // Start server only if run directly (Local Dev)
 if (require.main === module) {
