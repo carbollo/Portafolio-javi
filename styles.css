@@ -154,40 +154,6 @@ body.custom-cursor-active * {
     z-index: -1;
 }
 
-/* Subte Details: Nebula */
-.nebula-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.12;
-    background:
-        radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(0, 200, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(255, 100, 200, 0.2) 0%, transparent 60%);
-    animation: nebulaShift 20s ease-in-out infinite alternate;
-}
-
-@keyframes nebulaShift {
-    0% {
-        transform: scale(1) rotate(0deg);
-        opacity: 0.1;
-    }
-
-    50% {
-        transform: scale(1.1) rotate(2deg);
-        opacity: 0.15;
-    }
-
-    100% {
-        transform: scale(1.05) rotate(-1deg);
-        opacity: 0.12;
-    }
-}
-
 /* Shooting Star */
 .shooting-star {
     position: fixed;
