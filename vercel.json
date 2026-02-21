@@ -1,9 +1,7 @@
 {
-    "cleanUrls": true,
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "/api/index.js"
-        }
-    ]
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/proyectos/ocultar", "destination": "/api/proyectos/ocultar" },
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ]
 }
