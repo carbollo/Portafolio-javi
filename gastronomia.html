@@ -101,22 +101,20 @@
                 cursor: pointer;
                 transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
                 break-inside: avoid;
-                max-width: 900px;
-                margin: 0 auto 40px;
+                margin-bottom: 40px;
             }
 
             .project-card:hover {
                 transform: scale(0.98);
             }
 
-            /* Video/Image Placeholder (Gastronomía: más estrecha y sin recortes) */
+            /* Video/Image Placeholder */
             .project-media {
                 width: 100%;
-                height: auto;
-                display: block;
+                /* fixed height & cover removed */
                 opacity: 0.8;
                 transition: all 0.5s ease;
-                transform: scale(1.0);
+                transform: scale(1.05);
             }
 
             .project-card:hover .project-media {
