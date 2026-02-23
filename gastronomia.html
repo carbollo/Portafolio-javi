@@ -108,16 +108,14 @@
                 transform: scale(0.98);
             }
 
-            /* Video/Image Placeholder (Gastronomía: mostrar foto completa sin recortar) */
+            /* Video/Image Placeholder (Gastronomía: sin márgenes negros, recorte suave) */
             .project-media {
                 width: 100%;
-                height: auto;
-                max-height: 380px;
-                object-fit: contain;
-                background-color: #000;
+                height: 360px;
+                object-fit: cover;
                 opacity: 0.8;
                 transition: all 0.5s ease;
-                transform: scale(1.0);
+                transform: scale(1.02);
             }
 
             .project-card:hover .project-media {
